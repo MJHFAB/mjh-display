@@ -229,18 +229,26 @@
     text-align: center; padding: 40px; font-style: italic;
   }
 
-  /* ══════ SLIDE DOTS ══════ */
-  .slide-dots {
-    position: fixed; bottom: 16px; left: 50%;
-    transform: translateX(-50%);
-    display: flex; gap: 8px; z-index: 100;
+
+
+  /* ══════ SCROLLING TICKER ══════ */
+  .footer-ticker-wrap {
+    flex: 1;
+    overflow: hidden;
+    margin: 0 24px;
+    position: relative;
   }
-  .sdot {
-    width: 28px; height: 4px; border-radius: 2px;
-    background: var(--border);
-    transition: background 0.4s, width 0.4s;
+  .footer-ticker-scroll {
+    display: inline-block;
+    white-space: nowrap;
+    font-size: 13px;
+    color: #7a8694;
+    animation: ticker-scroll 30s linear infinite;
   }
-  .sdot.active { background: var(--blue); width: 40px; }
+  @keyframes ticker-scroll {
+    0%   { transform: translateX(100vw); }
+    100% { transform: translateX(-100%); }
+  }
 </style>
 </head>
 <body>
@@ -268,7 +276,7 @@
 
   <footer>
     <div class="footer-brand"><div class="live-dot"></div>MJ&H Fabrication, Inc. — Ponca City, OK</div>
-    <div class="footer-ticker" id="ann-ticker"></div>
+    <div class="footer-ticker-wrap"><div class="footer-ticker-scroll" id="ann-ticker"></div></div>
     <div class="footer-clock" id="clock1"></div>
   </footer>
 </div>
@@ -296,21 +304,18 @@
 
   <footer>
     <div class="footer-brand"><div class="live-dot"></div>MJ&H Fabrication, Inc. — Ponca City, OK</div>
-    <div class="footer-ticker">📋 Safety Meeting every Tuesday at 2:30pm in the breakroom</div>
+    <div class="footer-ticker-wrap"><div class="footer-ticker-scroll" id="jobs-ticker"></div></div>
     <div class="footer-clock" id="clock2"></div>
   </footer>
 </div>
 
-<!-- SCREEN DOTS -->
-<div class="slide-dots">
-  <div class="sdot active" id="sdot-0"></div>
-  <div class="sdot" id="sdot-1"></div>
-</div>
+
 
 <script>
 /* ══════ CONFIG ══════ */
 const ANNOUNCEMENTS_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQNKNe41oOT518N9wl57Bwhw3NXOvLxlPPB31QoBouaj8U8eksJpd0EFkuFtMSIE15h7TaXgGUcXCuL/pub?gid=0&single=true&output=csv";
 const JOBS_CSV          = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQNKNe41oOT518N9wl57Bwhw3NXOvLxlPPB31QoBouaj8U8eksJpd0EFkuFtMSIE15h7TaXgGUcXCuL/pub?gid=1375005608&single=true&output=csv";
+const TICKER_CSV        = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQNKNe41oOT518N9wl57Bwhw3NXOvLxlPPB31QoBouaj8U8eksJpd0EFkuFtMSIE15h7TaXgGUcXCuL/pub?gid=1977392702&single=true&output=csv";
 const SECS_PER_ANN      = 6;   // seconds each announcement is shown
 const JOBS_DURATION     = 20;  // seconds job status screen shows
 
@@ -518,14 +523,12 @@ function showScreen(idx) {
   // hide current
   const prev = document.getElementById(SCREENS[currentScreen]);
   prev.classList.remove('active');
-  document.getElementById(`sdot-${currentScreen}`).classList.remove('active');
 
   currentScreen = idx % SCREENS.length;
 
   const next = document.getElementById(SCREENS[currentScreen]);
   next.style.display = 'grid';
   requestAnimationFrame(() => requestAnimationFrame(() => next.classList.add('active')));
-  document.getElementById(`sdot-${currentScreen}`).classList.add('active');
 
   if (currentScreen === 0) {
     // Restart carousel from first card
@@ -547,6 +550,30 @@ setTimeout(() => {
   const totalTime = Math.max(window._annPageCount || Math.ceil(annData.length / 2), 1) * SECS_PER_ANN * 1000;
   setTimeout(() => showScreen(1), totalTime);
 }, 1500);
+
+/* ══════ TICKER ══════ */
+async function fetchTicker() {
+  try {
+    const r = await fetch(TICKER_CSV);
+    const text = await r.text();
+    const rows = parseCSV(text);
+    const messages = rows.map(r => r.message || r.Message || Object.values(r)[0] || '').filter(Boolean);
+    if (!messages.length) return;
+    const combined = messages.join('     ·     ');
+    const el1 = document.getElementById('ann-ticker');
+    const el2 = document.getElementById('jobs-ticker');
+    if (el1) el1.textContent = combined;
+    if (el2) el2.textContent = combined;
+    // Adjust animation duration based on message length (longer = slower scroll)
+    const duration = Math.max(20, messages.length * 8) + 's';
+    if (el1) el1.style.animationDuration = duration;
+    if (el2) el2.style.animationDuration = duration;
+  } catch(e) {
+    console.log('Ticker fetch failed', e);
+  }
+}
+fetchTicker();
+setInterval(fetchTicker, 3 * 60 * 1000);
 </script>
 </body>
 </html>
