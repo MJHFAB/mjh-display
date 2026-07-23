@@ -32,7 +32,7 @@
 
   /* ══════ SCREENS ══════ */
   .screen {
-    width: 100vw; height: 100vh;
+    width: 100vw; height: calc(100vh - 52px);
     display: none;
     grid-template-rows: 88px 1fr;
     position: absolute;
@@ -105,6 +105,8 @@
     display: flex;
     align-items: stretch;
     flex: 1;
+    min-height: 0;
+    height: 100%;
   }
   .ann-track {
     display: flex;
@@ -262,7 +264,7 @@
     </div>
   </header>
 
-  <div style="display:flex; flex-direction:column; overflow:hidden; flex:1; min-height:0;">
+  <div style="display:flex; flex-direction:column; overflow:hidden; min-height:0; height:100%;">
     <div class="ann-viewport" id="ann-viewport">
       <div class="ann-track" id="ann-track"></div>
     </div>
@@ -389,7 +391,6 @@ function buildCarousel() {
 
   // Show 2 cards per page — pair them up
   const vpWidth = vp.offsetWidth || window.innerWidth - 96;
-  console.log('BUILD CAROUSEL vpWidth:', vpWidth, 'annData:', annData.length, 'vp display:', window.getComputedStyle(vp).display, 'vp height:', vp.offsetHeight);
   const gap = 20;
   const cardWidth = (vpWidth - gap) / 2;
 
@@ -400,7 +401,6 @@ function buildCarousel() {
   }
   window._annPages = pages;
 
-  console.log('PAGES:', pages.length, 'TRACK el:', !!track, 'screen active:', document.getElementById('screen-announcements').classList.contains('active'));
   track.innerHTML = pages.map((pair, pi) => {
     return `<div class="ann-page" style="display:flex;gap:${gap}px;width:${vpWidth}px;flex-shrink:0;">` +
       pair.map(r => {
@@ -467,9 +467,7 @@ async function fetchAnnouncements() {
   try {
     const r = { text: async () => await fetchCSV(ANN_URL), ok: true };
     const text = await r.text();
-    console.log('ANN RAW:', text.substring(0, 200));
     annData = parseCSV(text);
-    console.log('ANN PARSED:', annData.length, 'rows', JSON.stringify(annData[0]));
     buildCarousel();
     const now = new Date();
     document.getElementById('ann-updated').textContent =
