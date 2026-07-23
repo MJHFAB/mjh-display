@@ -101,7 +101,6 @@
   .ann-viewport {
     overflow: hidden;
     position: relative;
-    padding: 16px 48px;
     display: flex;
     align-items: stretch;
     flex: 1;
@@ -110,13 +109,13 @@
   }
   .ann-track {
     display: flex;
-    gap: 24px;
     transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
     will-change: transform;
     align-items: stretch;
   }
   .ann-page {
     align-items: stretch !important;
+    box-sizing: border-box;
   }
   .ann-card {
     background: var(--panel);
@@ -389,10 +388,11 @@ function buildCarousel() {
 
   if (!track || !dots || !vp) { console.error('Carousel elements not found'); return; }
 
-  // Show 2 cards per page — pair them up
-  const vpWidth = vp.offsetWidth || window.innerWidth - 96;
-  const gap = 20;
-  const cardWidth = (vpWidth - gap) / 2;
+  // Show 2 cards per page with equal padding on all sides
+  const vpWidth = vp.offsetWidth || window.innerWidth;
+  const pad = 32;
+  const gap = pad;
+  const cardWidth = (vpWidth - pad * 2 - gap) / 2;
 
   // Group announcements into pairs
   const pages = [];
@@ -402,7 +402,7 @@ function buildCarousel() {
   window._annPages = pages;
 
   track.innerHTML = pages.map((pair, pi) => {
-    return `<div class="ann-page" style="display:flex;gap:${gap}px;width:${vpWidth}px;flex-shrink:0;">` +
+    return `<div class="ann-page" style="display:flex;gap:${gap}px;width:${vpWidth}px;flex-shrink:0;padding:16px ${pad}px;box-sizing:border-box;">` +
       pair.map(r => {
         const cls = categoryClass(r.category);
         return `
@@ -432,7 +432,7 @@ function buildCarousel() {
 function scrollToAnn(idx, animate = true) {
   const vp    = document.getElementById('ann-viewport');
   const track = document.getElementById('ann-track');
-  const vpWidth = vp.offsetWidth || window.innerWidth - 96;
+  const vpWidth = vp.offsetWidth || window.innerWidth;
 
   if (!animate) track.style.transition = 'none';
   else track.style.transition = 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
