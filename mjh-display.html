@@ -473,14 +473,20 @@ setInterval(fetchAnnouncements, 3 * 60 * 1000);
 /* ══════ JOB STATUS ══════ */
 function statusBadge(s) {
   const map = {
-    'active':      ['sb-active',   'In Progress'],
-    'in progress': ['sb-active',   'In Progress'],
-    'review':      ['sb-review',   'In Review'],
-    'in review':   ['sb-review',   'In Review'],
-    'complete':    ['sb-complete', 'Complete'],
-    'done':        ['sb-complete', 'Complete'],
-    'hold':        ['sb-hold',     'On Hold'],
-    'on hold':     ['sb-hold',     'On Hold'],
+    'active':       ['sb-active',   'In Progress'],
+    'in progress':  ['sb-active',   'In Progress'],
+    'in-progress':  ['sb-active',   'In Progress'],
+    'review':       ['sb-review',   'In Review'],
+    'in review':    ['sb-review',   'In Review'],
+    'in-review':    ['sb-review',   'In Review'],
+    'complete':     ['sb-complete', 'Complete'],
+    'completed':    ['sb-complete', 'Complete'],
+    'done':         ['sb-complete', 'Complete'],
+    'hold':         ['sb-hold',     'On Hold'],
+    'on hold':      ['sb-hold',     'On Hold'],
+    'not started':  ['sb-hold',     'Not Started'],
+    'not-started':  ['sb-hold',     'Not Started'],
+    'pending':      ['sb-hold',     'Pending'],
   };
   const [cls, label] = map[(s||'').toLowerCase()] || ['sb-active','In Progress'];
   return `<span class="status-badge ${cls}">${label}</span>`;
@@ -499,7 +505,7 @@ async function fetchJobs() {
     container.innerHTML = rows.map(r => {
       const pct = Math.min(100, Math.max(0, parseInt(r.progress)||0));
       const st  = (r.status||'').toLowerCase();
-      const pcls = st.includes('complete')||st==='done' ? 'done' : pct < 30 ? 'behind' : '';
+      const pcls = st.includes('complete')||st==='done'||pct>=100 ? 'done' : pct < 30 ? 'behind' : '';
       const jobNum = r['job number'] || r['job#'] || r['job #'] || '—';
       return `
         <div class="job-row">
