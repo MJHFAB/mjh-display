@@ -300,19 +300,21 @@
 /* ══════ CONFIG ══════ */
 // Fetch CSV with automatic CORS fallback
 async function fetchCSV(url) {
+  // Add cache buster so browser never serves stale data
+  const bust = url + (url.includes('?') ? '&' : '?') + '_cb=' + Date.now();
   // Try direct first (works on Pi/Yodeck)
   try {
-    const r = await fetch(url, { mode: 'cors' });
+    const r = await fetch(bust, { mode: 'cors', cache: 'no-store' });
     if (r.ok) return await r.text();
   } catch(e) {}
   // Fallback 1: allorigins
   try {
-    const r = await fetch("https://api.allorigins.win/raw?url=" + encodeURIComponent(url));
+    const r = await fetch("https://api.allorigins.win/raw?url=" + encodeURIComponent(bust));
     if (r.ok) return await r.text();
   } catch(e) {}
   // Fallback 2: corsproxy.io
   try {
-    const r = await fetch("https://corsproxy.io/?url=" + encodeURIComponent(url));
+    const r = await fetch("https://corsproxy.io/?url=" + encodeURIComponent(bust));
     if (r.ok) return await r.text();
   } catch(e) {}
   throw new Error("All fetch attempts failed");
