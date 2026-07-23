@@ -23,7 +23,7 @@
   }
 
   html, body {
-    width: 1280px; height: 720px;
+    width: 100vw; height: 100vh;
     overflow: hidden;
     background: var(--dark);
     font-family: 'Barlow', sans-serif;
@@ -32,7 +32,7 @@
 
   /* ══════ SCREENS ══════ */
   .screen {
-    width: 1280px; height: 720px;
+    width: 100vw; height: 100vh;
     display: none;
     grid-template-rows: 88px 1fr 52px;
     position: absolute;
@@ -361,27 +361,42 @@ function buildCarousel() {
   const dots  = document.getElementById('ann-dots');
   const vp    = document.getElementById('ann-viewport');
 
-  // card width: fill viewport with slight peek of next card
-  const vpWidth = vp.clientWidth || 1184;
-  const cardWidth = vpWidth - 48; // slight right peek
+  // Show 2 cards per page — pair them up
+  const vpWidth = vp.clientWidth || window.innerWidth - 96;
+  const gap = 20;
+  const cardWidth = (vpWidth - gap) / 2;
 
-  track.innerHTML = annData.map((r, i) => {
-    const cls = categoryClass(r.category);
-    return `
-      <div class="ann-card" style="width:${cardWidth}px; min-height: 480px;">
-        <div class="card-accent ca-${cls}"></div>
-        <div class="card-inner">
-          <span class="card-tag ct-${cls}">${r.category || 'Info'}</span>
-          <div class="card-title">${r.title || ''}</div>
-          <div class="card-body">${r.body || ''}</div>
-          ${r.footer ? `<div class="card-footer">${r.footer}</div>` : ''}
-        </div>
-      </div>`;
+  // Group announcements into pairs
+  const pages = [];
+  for (let i = 0; i < annData.length; i += 2) {
+    pages.push(annData.slice(i, i + 2));
+  }
+  window._annPages = pages;
+
+  track.innerHTML = pages.map((pair, pi) => {
+    return `<div class="ann-page" style="display:flex;gap:${gap}px;width:${vpWidth}px;flex-shrink:0;">` +
+      pair.map(r => {
+        const cls = categoryClass(r.category);
+        return `
+          <div class="ann-card" style="width:${cardWidth}px;flex-shrink:0;">
+            <div class="card-accent ca-${cls}"></div>
+            <div class="card-inner">
+              <span class="card-tag ct-${cls}">${r.category || 'Info'}</span>
+              <div class="card-title">${r.title || ''}</div>
+              <div class="card-body">${r.body || ''}</div>
+              ${r.footer ? `<div class="card-footer">${r.footer}</div>` : ''}
+            </div>
+          </div>`;
+      }).join('') +
+    '</div>';
   }).join('');
 
-  dots.innerHTML = annData.map((_, i) =>
+  dots.innerHTML = pages.map((_, i) =>
     `<div class="ann-dot${i===0?' active':''}" id="adot-${i}"></div>`
   ).join('');
+
+  // Update carousel length to page count
+  window._annPageCount = pages.length;
 
   scrollToAnn(0, false);
 }
@@ -389,13 +404,12 @@ function buildCarousel() {
 function scrollToAnn(idx, animate = true) {
   const vp    = document.getElementById('ann-viewport');
   const track = document.getElementById('ann-track');
-  const vpWidth = vp.clientWidth || 1184;
-  const cardWidth = vpWidth - 48;
+  const vpWidth = vp.clientWidth || window.innerWidth - 96;
 
   if (!animate) track.style.transition = 'none';
   else track.style.transition = 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
 
-  track.style.transform = `translateX(-${idx * (cardWidth + 24)}px)`;
+  track.style.transform = `translateX(-${idx * vpWidth}px)`;
 
   document.querySelectorAll('.ann-dot').forEach((d, i) => {
     d.classList.toggle('active', i === idx);
@@ -409,7 +423,8 @@ function startCarousel() {
   carouselRunning = true;
   annTimer = setInterval(() => {
     if (!carouselRunning) return;
-    const next = (annIndex + 1) % annData.length;
+    const pageCount = window._annPageCount || Math.ceil(annData.length / 2) || 1;
+    const next = (annIndex + 1) % pageCount;
     scrollToAnn(next);
   }, SECS_PER_ANN * 1000);
 }
@@ -436,7 +451,7 @@ async function fetchAnnouncements() {
   }
 }
 fetchAnnouncements();
-setInterval(fetchAnnouncements, 5 * 60 * 1000);
+setInterval(fetchAnnouncements, 3 * 60 * 1000);
 
 /* ══════ JOB STATUS ══════ */
 function statusBadge(s) {
@@ -513,7 +528,7 @@ function showScreen(idx) {
     scrollToAnn(0, false);
     startCarousel();
     // Schedule hand-off to jobs after all announcements have shown
-    const totalTime = annData.length * SECS_PER_ANN * 1000;
+    const totalTime = Math.max(window._annPageCount || Math.ceil(annData.length / 2), 1) * SECS_PER_ANN * 1000;
     setTimeout(() => showScreen(1), totalTime);
   } else {
     stopCarousel();
@@ -525,7 +540,7 @@ function showScreen(idx) {
 setTimeout(() => {
   scrollToAnn(0, false);
   startCarousel();
-  const totalTime = Math.max(annData.length, 1) * SECS_PER_ANN * 1000;
+  const totalTime = Math.max(window._annPageCount || Math.ceil(annData.length / 2), 1) * SECS_PER_ANN * 1000;
   setTimeout(() => showScreen(1), totalTime);
 }, 1500);
 </script>
