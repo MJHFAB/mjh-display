@@ -256,7 +256,7 @@
     <div class="ann-viewport" id="ann-viewport">
       <div class="ann-track" id="ann-track"></div>
     </div>
-
+    <div id="ann-dots" style="display:none;"></div>
   </div>
 
   <footer>
@@ -375,7 +375,7 @@ function buildCarousel() {
   const dots  = document.getElementById('ann-dots');
   const vp    = document.getElementById('ann-viewport');
 
-  if (!track || !dots || !vp) { console.error('Carousel elements not found'); return; }
+  if (!track || !vp) { console.error('Carousel elements not found'); return; }
 
   // Show 2 cards per page with equal padding on all sides
   const vpWidth = vp.offsetWidth || window.innerWidth;
