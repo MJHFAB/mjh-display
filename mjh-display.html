@@ -106,15 +106,20 @@
   .ann-viewport {
     overflow: hidden;
     position: relative;
-    padding: 0 48px;
+    padding: 16px 48px;
     display: flex;
-    align-items: center;
+    align-items: stretch;
+    flex: 1;
   }
   .ann-track {
     display: flex;
     gap: 24px;
     transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
     will-change: transform;
+    align-items: stretch;
+  }
+  .ann-page {
+    align-items: stretch !important;
   }
   .ann-card {
     background: var(--panel);
@@ -124,7 +129,6 @@
     display: flex;
     flex-direction: column;
     flex-shrink: 0;
-    /* width set by JS based on count */
   }
   .card-accent { height: 4px; flex-shrink: 0; }
   .ca-hours   { background: var(--purple); }
@@ -133,7 +137,7 @@
   .ca-safety  { background: var(--red); }
   .ca-info    { background: var(--blue); }
 
-  .card-inner { padding: 20px 22px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+  .card-inner { padding: 24px 26px; display: flex; flex-direction: column; gap: 12px; flex: 1; }
   .card-tag {
     display: inline-flex; align-items: center; gap: 6px;
     font-size: 10px; font-weight: 600;
@@ -148,11 +152,11 @@
 
   .card-title {
     font-family: 'Barlow Condensed', sans-serif;
-    font-size: 24px; font-weight: 700;
+    font-size: 30px; font-weight: 700;
     text-transform: uppercase; letter-spacing: 0.5px;
     color: var(--text); line-height: 1.15;
   }
-  .card-body { font-size: 15px; color: #c5cdd6; line-height: 1.65; flex: 1; }
+  .card-body { font-size: 17px; color: #c5cdd6; line-height: 1.7; flex: 1; }
   .card-footer {
     margin-top: 10px; padding-top: 10px;
     border-top: 1px solid var(--border);
@@ -255,7 +259,7 @@
     </div>
   </header>
 
-  <div style="display:flex; flex-direction:column; overflow:hidden;">
+  <div style="display:flex; flex-direction:column; overflow:hidden; flex:1; min-height:0;">
     <div class="ann-viewport" id="ann-viewport">
       <div class="ann-track" id="ann-track"></div>
     </div>
