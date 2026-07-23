@@ -11,11 +11,11 @@
 
   :root {
     --blue: #1285D5;
-    --dark: #18191c;
-    --panel: #212429;
+    --dark: #13151A;
+    --panel: #23282F;
     --border: #2e343d;
-    --text: #f0f4f8;
-    --text-dim: #9aa5b1;
+    --text: #FFFFFF;
+    --text-dim: #B0BEC5;
     --amber: #F59E0B;
     --green: #10B981;
     --purple: #8B5CF6;
@@ -27,7 +27,7 @@
     overflow: hidden;
     background: var(--dark);
     font-family: 'Barlow', sans-serif;
-    color: var(--text);
+    color: #FFFFFF;
   }
 
   /* ══════ SCREENS ══════ */
@@ -65,23 +65,23 @@
     font-family: 'Barlow Condensed', sans-serif;
     font-size: 30px; font-weight: 700;
     letter-spacing: 3px; text-transform: uppercase;
-    color: var(--text); line-height: 1;
+    color: #FFFFFF; line-height: 1;
   }
   .slide-sub {
-    font-size: 11px; color: var(--text-dim);
+    font-size: 11px; color: #B0BEC5;
     letter-spacing: 2px; text-transform: uppercase; margin-top: 4px;
   }
   .header-right { text-align: right; }
-  .date-label { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1.5px; }
+  .date-label { font-size: 10px; color: #B0BEC5; text-transform: uppercase; letter-spacing: 1.5px; }
   .date-value {
     font-family: 'Barlow Condensed', sans-serif;
-    font-size: 18px; font-weight: 600; color: var(--text); margin-top: 2px;
+    font-size: 18px; font-weight: 600; color: #FFFFFF; margin-top: 2px;
   }
 
   /* ══════ FOOTER ══════ */
   footer { display: none; }
   .footer-brand {
-    font-size: 11px; color: var(--text-dim);
+    font-size: 11px; color: #B0BEC5;
     letter-spacing: 1px; text-transform: uppercase;
     display: flex; align-items: center; gap: 8px;
   }
@@ -91,10 +91,10 @@
     animation: pulse 2s infinite;
   }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.25} }
-  .footer-ticker { font-size: 12px; color: #7a8694; font-style: italic; }
+  .footer-ticker { font-size: 12px; color: #B0BEC5; font-style: italic; }
   .footer-clock {
     font-family: 'Barlow Condensed', sans-serif;
-    font-size: 20px; font-weight: 600; color: var(--text); letter-spacing: 1px;
+    font-size: 20px; font-weight: 600; color: #FFFFFF; letter-spacing: 1px;
   }
 
   /* ══════ ANNOUNCEMENT CAROUSEL ══════ */
@@ -136,7 +136,7 @@
   .card-inner { padding: 24px 26px; display: flex; flex-direction: column; gap: 12px; flex: 1; }
   .card-tag {
     display: inline-flex; align-items: center; gap: 6px;
-    font-size: 10px; font-weight: 600;
+    font-size: 11px; font-weight: 700;
     letter-spacing: 1.5px; text-transform: uppercase;
   }
   .card-tag::before { content:''; width:6px; height:6px; border-radius:50%; background:currentColor; flex-shrink:0; }
@@ -150,13 +150,13 @@
     font-family: 'Barlow Condensed', sans-serif;
     font-size: 30px; font-weight: 700;
     text-transform: uppercase; letter-spacing: 0.5px;
-    color: var(--text); line-height: 1.15;
+    color: #FFFFFF; line-height: 1.15;
   }
-  .card-body { font-size: 17px; color: #c5cdd6; line-height: 1.7; flex: 1; }
+  .card-body { font-size: 17px; color: #E8EDF2; line-height: 1.7; flex: 1; }
   .card-footer {
     margin-top: 10px; padding-top: 10px;
     border-top: 1px solid var(--border);
-    font-size: 11px; color: var(--text-dim);
+    font-size: 11px; color: #B0BEC5;
   }
 
   /* carousel dots */
@@ -185,7 +185,7 @@
     padding: 6px 16px;
     font-size: 10px; font-weight: 600;
     letter-spacing: 1.5px; text-transform: uppercase;
-    color: var(--text-dim);
+    color: #B0BEC5;
     border-bottom: 1px solid var(--border);
   }
   .job-row {
@@ -203,14 +203,14 @@
     font-size: 17px; font-weight: 700;
     color: var(--blue); letter-spacing: 1px;
   }
-  .job-client { font-size: 14px; color: var(--text); font-weight: 500; }
-  .job-due { font-size: 13px; color: var(--text-dim); }
+  .job-client { font-size: 14px; color: #FFFFFF; font-weight: 500; }
+  .job-due { font-size: 13px; color: #B0BEC5; }
   .progress-wrap { display: flex; flex-direction: column; gap: 4px; }
   .progress-bar { background: var(--border); border-radius: 3px; height: 6px; overflow: hidden; }
   .progress-fill { height: 100%; border-radius: 3px; background: var(--blue); transition: width 1s ease; }
   .progress-fill.done   { background: var(--green); }
   .progress-fill.behind { background: var(--amber); }
-  .progress-pct { font-size: 11px; color: var(--text-dim); }
+  .progress-pct { font-size: 11px; color: #B0BEC5; }
   .status-badge {
     display: inline-block; padding: 3px 10px;
     border-radius: 3px; font-size: 11px; font-weight: 600;
@@ -221,7 +221,7 @@
   .sb-complete { background: #1a3d1a; color: #66BB6A; }
   .sb-hold     { background: #3a2020; color: #EF9A9A; }
   .empty-state {
-    font-size: 14px; color: var(--text-dim);
+    font-size: 14px; color: #B0BEC5;
     text-align: center; padding: 40px; font-style: italic;
   }
 
@@ -238,7 +238,7 @@
     display: inline-block;
     white-space: nowrap;
     font-size: 13px;
-    color: #7a8694;
+    color: #B0BEC5;
     animation: ticker-scroll 30s linear infinite;
   }
   @keyframes ticker-scroll {
@@ -613,7 +613,7 @@ setInterval(fetchTicker, 3 * 60 * 1000);
       display: inline-block;
       white-space: nowrap;
       font-size: 13px;
-      color: #7a8694;
+      color: #B0BEC5;
       animation: ticker-scroll 40s linear infinite;
     "></div>
   </div>
