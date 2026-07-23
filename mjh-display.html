@@ -484,9 +484,13 @@ function statusBadge(s) {
     'done':         ['sb-complete', 'Complete'],
     'hold':         ['sb-hold',     'On Hold'],
     'on hold':      ['sb-hold',     'On Hold'],
+    'on-hold':      ['sb-hold',     'On Hold'],
     'not started':  ['sb-hold',     'Not Started'],
     'not-started':  ['sb-hold',     'Not Started'],
     'pending':      ['sb-hold',     'Pending'],
+    'in-review':    ['sb-review',   'In Review'],
+    'complete':     ['sb-complete', 'Complete'],
+    'completed':    ['sb-complete', 'Complete'],
   };
   const [cls, label] = map[(s||'').toLowerCase()] || ['sb-active','In Progress'];
   return `<span class="status-badge ${cls}">${label}</span>`;
