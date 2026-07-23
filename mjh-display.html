@@ -470,10 +470,9 @@ async function fetchAnnouncements() {
     annData = parseCSV(text);
     buildCarousel();
     const now = new Date();
-    document.getElementById('ann-updated').textContent =
-      now.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
-    const notice = annData.find(r => (r.category||'').toLowerCase() === 'notice') || annData[0];
-    if (notice) document.getElementById('ann-ticker').textContent = `📋 ${notice.title}`;
+    const annUpdEl = document.getElementById('ann-updated');
+    if (annUpdEl) annUpdEl.textContent = now.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+    // ticker is now handled by fetchTicker() — no per-announcement ticker needed
   } catch(e) {
     console.error('ANN ERROR:', e.message, e.stack);
     document.getElementById('ann-track').innerHTML = '<div class="empty-state">Error: ' + e.message + '</div>';
