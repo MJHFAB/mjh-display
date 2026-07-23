@@ -308,10 +308,29 @@
 
 <script>
 /* ══════ CONFIG ══════ */
-const PROXY = "https://corsproxy.io/?url=";
-const ANNOUNCEMENTS_CSV = PROXY + encodeURIComponent("https://docs.google.com/spreadsheets/d/e/2PACX-1vQNKNe41oOT518N9wl57Bwhw3NXOvLxlPPB31QoBouaj8U8eksJpd0EFkuFtMSIE15h7TaXgGUcXCuL/pub?gid=0&single=true&output=csv");
-const JOBS_CSV          = PROXY + encodeURIComponent("https://docs.google.com/spreadsheets/d/e/2PACX-1vQNKNe41oOT518N9wl57Bwhw3NXOvLxlPPB31QoBouaj8U8eksJpd0EFkuFtMSIE15h7TaXgGUcXCuL/pub?gid=1375005608&single=true&output=csv");
-const TICKER_CSV        = PROXY + encodeURIComponent("https://docs.google.com/spreadsheets/d/e/2PACX-1vQNKNe41oOT518N9wl57Bwhw3NXOvLxlPPB31QoBouaj8U8eksJpd0EFkuFtMSIE15h7TaXgGUcXCuL/pub?gid=1977392702&single=true&output=csv");
+// Fetch CSV with automatic CORS fallback
+async function fetchCSV(url) {
+  // Try direct first (works on Pi/Yodeck)
+  try {
+    const r = await fetch(url, { mode: 'cors' });
+    if (r.ok) return await r.text();
+  } catch(e) {}
+  // Fallback 1: allorigins
+  try {
+    const r = await fetch("https://api.allorigins.win/raw?url=" + encodeURIComponent(url));
+    if (r.ok) return await r.text();
+  } catch(e) {}
+  // Fallback 2: corsproxy.io
+  try {
+    const r = await fetch("https://corsproxy.io/?url=" + encodeURIComponent(url));
+    if (r.ok) return await r.text();
+  } catch(e) {}
+  throw new Error("All fetch attempts failed");
+}
+
+const ANN_URL    = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQNKNe41oOT518N9wl57Bwhw3NXOvLxlPPB31QoBouaj8U8eksJpd0EFkuFtMSIE15h7TaXgGUcXCuL/pub?gid=0&single=true&output=csv";
+const JOBS_URL   = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQNKNe41oOT518N9wl57Bwhw3NXOvLxlPPB31QoBouaj8U8eksJpd0EFkuFtMSIE15h7TaXgGUcXCuL/pub?gid=1375005608&single=true&output=csv";
+const TICKER_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQNKNe41oOT518N9wl57Bwhw3NXOvLxlPPB31QoBouaj8U8eksJpd0EFkuFtMSIE15h7TaXgGUcXCuL/pub?gid=1977392702&single=true&output=csv";
 const SECS_PER_ANN      = 6;   // seconds each announcement is shown
 const JOBS_DURATION     = 20;  // seconds job status screen shows
 
@@ -442,7 +461,7 @@ function stopCarousel() {
 
 async function fetchAnnouncements() {
   try {
-    const r = await fetch(ANNOUNCEMENTS_CSV);
+    const r = { text: async () => await fetchCSV(ANN_URL), ok: true };
     const text = await r.text();
     annData = parseCSV(text);
     buildCarousel();
@@ -476,7 +495,7 @@ function statusBadge(s) {
 
 async function fetchJobs() {
   try {
-    const r = await fetch(JOBS_CSV);
+    const r = { text: async () => await fetchCSV(JOBS_URL), ok: true };
     const text = await r.text();
     const rows = parseCSV(text);
     const container = document.getElementById('jobs-rows');
@@ -550,7 +569,7 @@ setTimeout(() => {
 /* ══════ TICKER ══════ */
 async function fetchTicker() {
   try {
-    const r = await fetch(TICKER_CSV);
+    const r = { text: async () => await fetchCSV(TICKER_URL), ok: true };
     const text = await r.text();
     const rows = parseCSV(text);
     const messages = rows.map(r => r.message || r.Message || Object.values(r)[0] || '').filter(Boolean);
