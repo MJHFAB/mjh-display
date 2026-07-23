@@ -475,7 +475,8 @@ async function fetchAnnouncements() {
     const notice = annData.find(r => (r.category||'').toLowerCase() === 'notice') || annData[0];
     if (notice) document.getElementById('ann-ticker').textContent = `📋 ${notice.title}`;
   } catch(e) {
-    document.getElementById('ann-track').innerHTML = '<div class="empty-state">Could not load announcements.</div>';
+    console.error('ANN ERROR:', e.message, e.stack);
+    document.getElementById('ann-track').innerHTML = '<div class="empty-state">Error: ' + e.message + '</div>';
   }
 }
 setTimeout(fetchAnnouncements, 300);
