@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MJ&H Fabrication — Shop Display</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@300;400;500;600&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --blue: #1285D5;
+    --dark: #13151A;
+    --panel: #23282F;
+    --border: #2e343d;
+    --text: #FFFFFF;
+    --text-dim: #B0BEC5;
+    --amber: #F59E0B;
+    --green: #10B981;
+    --purple: #8B5CF6;
+    --red: #EF4444;
+  }
+
+  html, body {
+    width: 100vw; height: 100vh;
+    overflow: hidden;
+    background: var(--dark);
+    font-family: 'Barlow', sans-serif;
+    color: #FFFFFF;
+  }
+
+  /* ══════ SCREENS ══════ */
+  .screen {
+    width: 100vw; height: calc(100vh - 56px);
+    display: none;
+    grid-template-rows: 88px 1fr;
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.7s ease;
+  }
+  .screen.active { display: grid; opacity: 1; }
+  .screen::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    background: var(--blue);
+    z-index: 10;
+  }
+
+  /* ══════ HEADER ══════ */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 44px 0 48px;
+    background: var(--panel);
+    border-bottom: 3px solid var(--blue);
+  }
+  .logo img { height: 52px; width: auto; display: block; }
+  .header-center { text-align: center; }
+  .slide-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 34px; font-weight: 700;
+    letter-spacing: 3px; text-transform: uppercase;
+    color: #FFFFFF; line-height: 1;
+  }
+  .slide-sub {
+    font-size: 11px; color: #B0BEC5;
+    letter-spacing: 2px; text-transform: uppercase; margin-top: 4px;
+  }
+  .header-right { text-align: right; }
+  .date-label { font-size: 10px; color: #B0BEC5; text-transform: uppercase; letter-spacing: 1.5px; }
+  .date-value {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 18px; font-weight: 600; color: #FFFFFF; margin-top: 2px;
+  }
+
+  /* ══════ FOOTER ══════ */
+  footer { display: none; }
+  .footer-brand {
+    font-size: 11px; color: #B0BEC5;
+    letter-spacing: 1px; text-transform: uppercase;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .live-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--blue);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.25} }
+  .footer-ticker { font-size: 12px; color: #B0BEC5; font-style: italic; }
+  .footer-clock {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 20px; font-weight: 600; color: #FFFFFF; letter-spacing: 1px;
+  }
+
+  /* ══════ ANNOUNCEMENT CAROUSEL ══════ */
+  .ann-viewport {
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: stretch;
+    flex: 1;
+    min-height: 0;
+    height: 100%;
+  }
+  .ann-track {
+    display: flex;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
+    align-items: stretch;
+  }
+  .ann-page {
+    align-items: stretch !important;
+    box-sizing: border-box;
+  }
+  .ann-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+  }
+  .card-accent { height: 4px; flex-shrink: 0; }
+  .ca-hours   { background: var(--purple); }
+  .ca-notice  { background: var(--amber); }
+  .ca-event   { background: var(--green); }
+  .ca-safety  { background: var(--red); }
+  .ca-info    { background: var(--blue); }
+
+  .card-inner { padding: 28px 32px; display: flex; flex-direction: column; gap: 16px; flex: 1; }
+  .card-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 15px; font-weight: 700;
+    letter-spacing: 1.5px; text-transform: uppercase;
+  }
+  .card-tag::before { content:''; width:6px; height:6px; border-radius:50%; background:currentColor; flex-shrink:0; }
+  .ct-hours  { color: var(--purple); }
+  .ct-notice { color: var(--amber); }
+  .ct-event  { color: var(--green); }
+  .ct-safety { color: var(--red); }
+  .ct-info   { color: var(--blue); }
+
+  .card-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 30px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    color: #FFFFFF; line-height: 1.15;
+  }
+  .card-body { font-size: 22px; color: #FFFFFF; line-height: 1.7; flex: 1; }
+  .card-footer {
+    margin-top: 10px; padding-top: 10px;
+    border-top: 1px solid var(--border);
+    font-size: 11px; color: #B0BEC5;
+  }
+
+  /* carousel dots */
+  .ann-dots {
+    display: flex; justify-content: center; align-items: center;
+    gap: 6px; padding: 8px 0 0;
+    flex-shrink: 0;
+  }
+  .ann-dot {
+    width: 20px; height: 3px; border-radius: 2px;
+    background: var(--border);
+    transition: background 0.3s, width 0.3s;
+  }
+  .ann-dot.active { background: var(--blue); width: 32px; }
+
+  /* ══════ JOB STATUS ══════ */
+  .jobs-content {
+    padding: 20px 44px 20px 48px;
+    display: flex; flex-direction: column; gap: 10px;
+    overflow: hidden;
+  }
+  .jobs-header {
+    display: grid;
+    grid-template-columns: 1fr 1.6fr 1fr 1.4fr 1fr;
+    gap: 12px;
+    padding: 6px 16px;
+    font-size: 10px; font-weight: 600;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    color: #B0BEC5;
+    border-bottom: 1px solid var(--border);
+  }
+  .job-row {
+    display: grid;
+    grid-template-columns: 1fr 1.6fr 1fr 1.4fr 1fr;
+    gap: 12px;
+    padding: 18px 24px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    align-items: center;
+  }
+  .job-number {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 22px; font-weight: 700;
+    color: #1285D5; letter-spacing: 1px;
+  }
+  .job-client { font-size: 18px; color: #FFFFFF; font-weight: 500; }
+  .job-due { font-size: 17px; color: #C8D8E4; }
+  .progress-wrap { display: flex; flex-direction: column; gap: 4px; }
+  .progress-bar { background: var(--border); border-radius: 3px; height: 6px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 3px; background: var(--blue); transition: width 1s ease; }
+  .progress-fill.done   { background: var(--green); }
+  .progress-fill.behind { background: var(--amber); }
+  .progress-pct { font-size: 15px; color: #C8D8E4; }
+  .status-badge {
+    display: inline-block; padding: 5px 14px;
+    border-radius: 3px; font-size: 13px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 1px;
+  }
+  .sb-active   { background: #0d3a6e; color: #64B5F6; }
+  .sb-review   { background: #3d2a00; color: #FFB300; }
+  .sb-complete { background: #1a3d1a; color: #66BB6A; }
+  .sb-hold     { background: #3a2020; color: #EF9A9A; }
+  .empty-state {
+    font-size: 14px; color: #B0BEC5;
+    text-align: center; padding: 40px; font-style: italic;
+  }
+
+
+
+  /* ══════ SCROLLING TICKER ══════ */
+  .footer-ticker-wrap {
+    flex: 1;
+    overflow: hidden;
+    margin: 0 24px;
+    position: relative;
+  }
+  .footer-ticker-scroll {
+    display: inline-block;
+    white-space: nowrap;
+    font-size: 13px;
+    color: #B0BEC5;
+    animation: ticker-scroll 30s linear infinite;
+  }
+  @keyframes ticker-scroll {
+    0%   { transform: translateX(100vw); }
+    100% { transform: translateX(-100%); }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════ SCREEN 1: ANNOUNCEMENTS ══════ -->
+<div class="screen active" id="screen-announcements">
+  <header>
+    <div class="logo"><img src="mjh-logo-white2.png" alt="MJ&H Fabrication"></div>
+    <div class="header-center">
+      <div class="slide-title">Announcements</div>
+      <div class="slide-sub">MJ&H Fabrication, Inc.</div>
+    </div>
+    <div class="header-right">
+      <div class="date-label">Last Updated</div>
+      <div class="date-value" id="ann-updated">—</div>
+    </div>
+  </header>
+
+  <div style="display:flex; flex-direction:column; overflow:hidden; min-height:0; height:100%;">
+    <div class="ann-viewport" id="ann-viewport">
+      <div class="ann-track" id="ann-track"></div>
+    </div>
+    <div class="ann-dots" id="ann-dots"></div>
+  </div>
+
+  <footer>
+    <div class="footer-brand"><div class="live-dot"></div>MJ&H Fabrication, Inc. — Ponca City, OK</div>
+    <div></div>
+
+  </footer>
+</div>
+
+<!-- ══════ SCREEN 2: JOB STATUS ══════ -->
+<div class="screen" id="screen-jobs">
+  <header>
+    <div class="logo"><img src="mjh-logo-white2.png" alt="MJ&H Fabrication"></div>
+    <div class="header-center">
+      <div class="slide-title">Current Jobs</div>
+      <div class="slide-sub">Project Status Board</div>
+    </div>
+    <div class="header-right">
+      <div class="date-label">Last Synced</div>
+      <div class="date-value" id="jobs-updated">—</div>
+    </div>
+  </header>
+
+  <div class="jobs-content">
+    <div class="jobs-header">
+      <span>Job #</span><span>Client</span><span>Due Date</span><span>Progress</span><span>Status</span>
+    </div>
+    <div id="jobs-rows"><div class="empty-state">Loading job data...</div></div>
+  </div>
+
+  <footer>
+    <div class="footer-brand"><div class="live-dot"></div>MJ&H Fabrication, Inc. — Ponca City, OK</div>
+    <div></div>
+
+  </footer>
+</div>
+
+
+
+<script>
+/* ══════ CONFIG ══════ */
+// Fetch CSV with automatic CORS fallback
+async function fetchCSV(url) {
+  // Try direct first (works on Pi/Yodeck)
+  try {
+    const r = await fetch(url, { mode: 'cors' });
+    if (r.ok) return await r.text();
+  } catch(e) {}
+  // Fallback 1: allorigins
+  try {
+    const r = await fetch("https://api.allorigins.win/raw?url=" + encodeURIComponent(url));
+    if (r.ok) return await r.text();
+  } catch(e) {}
+  // Fallback 2: corsproxy.io
+  try {
+    const r = await fetch("https://corsproxy.io/?url=" + encodeURIComponent(url));
+    if (r.ok) return await r.text();
+  } catch(e) {}
+  throw new Error("All fetch attempts failed");
+}
+
+const ANN_URL    = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQNKNe41oOT518N9wl57Bwhw3NXOvLxlPPB31QoBouaj8U8eksJpd0EFkuFtMSIE15h7TaXgGUcXCuL/pub?gid=0&single=true&output=csv";
+const JOBS_URL   = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQNKNe41oOT518N9wl57Bwhw3NXOvLxlPPB31QoBouaj8U8eksJpd0EFkuFtMSIE15h7TaXgGUcXCuL/pub?gid=1375005608&single=true&output=csv";
+const TICKER_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQNKNe41oOT518N9wl57Bwhw3NXOvLxlPPB31QoBouaj8U8eksJpd0EFkuFtMSIE15h7TaXgGUcXCuL/pub?gid=1977392702&single=true&output=csv";
+const SECS_PER_ANN      = 6;   // seconds each announcement is shown
+const JOBS_DURATION     = 20;  // seconds job status screen shows
+
+/* ══════ CLOCK ══════ */
+function updateClock() {
+  const now = new Date();
+  const h = now.getHours(), m = now.getMinutes();
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  const str = `${h%12||12}:${String(m).padStart(2,'0')} ${ampm}`;
+  const el = document.getElementById('global-clock');
+  if (el) el.textContent = str;
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+/* ══════ CSV PARSER ══════ */
+function parseCSV(text) {
+  const lines = text.trim().split('\n');
+  const headers = lines[0].split(',').map(h => h.replace(/^"|"$/g,'').trim().toLowerCase());
+  return lines.slice(1).map(line => {
+    const vals = [];
+    let inQ = false, cur = '';
+    for (let c of line) {
+      if (c === '"') { inQ = !inQ; }
+      else if (c === ',' && !inQ) { vals.push(cur.trim()); cur = ''; }
+      else cur += c;
+    }
+    vals.push(cur.trim());
+    const obj = {};
+    headers.forEach((h, i) => obj[h] = (vals[i]||'').replace(/^"|"$/g,'').trim());
+    return obj;
+  }).filter(r => Object.values(r).some(v => v));
+}
+
+/* ══════ ANNOUNCEMENTS CAROUSEL ══════ */
+let annData = [];
+let annIndex = 0;
+let annTimer = null;
+let carouselRunning = false;
+
+function categoryClass(cat) {
+  const c = (cat||'').toLowerCase();
+  if (c === 'hours')  return 'hours';
+  if (c === 'notice') return 'notice';
+  if (c === 'event')  return 'event';
+  if (c === 'safety') return 'safety';
+  return 'info';
+}
+
+function buildCarousel() {
+  const track = document.getElementById('ann-track');
+  const dots  = document.getElementById('ann-dots');
+  const vp    = document.getElementById('ann-viewport');
+
+  if (!track || !dots || !vp) { console.error('Carousel elements not found'); return; }
+
+  // Show 2 cards per page with equal padding on all sides
+  const vpWidth = vp.offsetWidth || window.innerWidth;
+  const pad = 32;
+  const gap = pad;
+  const cardWidth = (vpWidth - pad * 2 - gap) / 2;
+
+  // Group announcements into pairs
+  const pages = [];
+  for (let i = 0; i < annData.length; i += 2) {
+    pages.push(annData.slice(i, i + 2));
+  }
+  window._annPages = pages;
+
+  track.innerHTML = pages.map((pair, pi) => {
+    return `<div class="ann-page" style="display:flex;gap:${gap}px;width:${vpWidth}px;flex-shrink:0;padding:16px ${pad}px;box-sizing:border-box;">` +
+      pair.map(r => {
+        const cls = categoryClass(r.category);
+        return `
+          <div class="ann-card" style="width:${cardWidth}px;flex-shrink:0;">
+            <div class="card-accent ca-${cls}"></div>
+            <div class="card-inner">
+              <span class="card-tag ct-${cls}">${r.category || 'Info'}</span>
+              <div class="card-title">${r.title || ''}</div>
+              <div class="card-body">${r.body || ''}</div>
+              ${r.footer ? `<div class="card-footer">${r.footer}</div>` : ''}
+            </div>
+          </div>`;
+      }).join('') +
+    '</div>';
+  }).join('');
+
+  dots.innerHTML = pages.map((_, i) =>
+    `<div class="ann-dot${i===0?' active':''}" id="adot-${i}"></div>`
+  ).join('');
+
+  // Update carousel length to page count
+  window._annPageCount = pages.length;
+
+  scrollToAnn(0, false);
+}
+
+function scrollToAnn(idx, animate = true) {
+  const vp    = document.getElementById('ann-viewport');
+  const track = document.getElementById('ann-track');
+  const vpWidth = vp.offsetWidth || window.innerWidth;
+
+  if (!animate) track.style.transition = 'none';
+  else track.style.transition = 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+
+  track.style.transform = `translateX(-${idx * vpWidth}px)`;
+
+  document.querySelectorAll('.ann-dot').forEach((d, i) => {
+    d.classList.toggle('active', i === idx);
+  });
+
+  annIndex = idx;
+}
+
+function startCarousel() {
+  if (annTimer) clearInterval(annTimer);
+  carouselRunning = true;
+  annTimer = setInterval(() => {
+    if (!carouselRunning) return;
+    const pageCount = window._annPageCount || Math.ceil(annData.length / 2) || 1;
+    const next = (annIndex + 1) % pageCount;
+    scrollToAnn(next);
+  }, SECS_PER_ANN * 1000);
+}
+
+function stopCarousel() {
+  carouselRunning = false;
+  if (annTimer) clearInterval(annTimer);
+  annTimer = null;
+}
+
+async function fetchAnnouncements() {
+  try {
+    const r = { text: async () => await fetchCSV(ANN_URL), ok: true };
+    const text = await r.text();
+    annData = parseCSV(text);
+    buildCarousel();
+    const now = new Date();
+    const annUpdEl = document.getElementById('ann-updated');
+    if (annUpdEl) annUpdEl.textContent = now.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+    // ticker is now handled by fetchTicker() — no per-announcement ticker needed
+  } catch(e) {
+    console.error('ANN ERROR:', e.message, e.stack);
+    document.getElementById('ann-track').innerHTML = '<div class="empty-state">Error: ' + e.message + '</div>';
+  }
+}
+setTimeout(fetchAnnouncements, 300);
+setInterval(fetchAnnouncements, 3 * 60 * 1000);
+
+/* ══════ JOB STATUS ══════ */
+function statusBadge(s) {
+  const map = {
+    'active':      ['sb-active',   'In Progress'],
+    'in progress': ['sb-active',   'In Progress'],
+    'review':      ['sb-review',   'In Review'],
+    'in review':   ['sb-review',   'In Review'],
+    'complete':    ['sb-complete', 'Complete'],
+    'done':        ['sb-complete', 'Complete'],
+    'hold':        ['sb-hold',     'On Hold'],
+    'on hold':     ['sb-hold',     'On Hold'],
+  };
+  const [cls, label] = map[(s||'').toLowerCase()] || ['sb-active','In Progress'];
+  return `<span class="status-badge ${cls}">${label}</span>`;
+}
+
+async function fetchJobs() {
+  try {
+    const r = { text: async () => await fetchCSV(JOBS_URL), ok: true };
+    const text = await r.text();
+    const rows = parseCSV(text);
+    const container = document.getElementById('jobs-rows');
+    if (!rows.length) {
+      container.innerHTML = '<div class="empty-state">No active jobs found.</div>';
+      return;
+    }
+    container.innerHTML = rows.map(r => {
+      const pct = Math.min(100, Math.max(0, parseInt(r.progress)||0));
+      const st  = (r.status||'').toLowerCase();
+      const pcls = st.includes('complete')||st==='done' ? 'done' : pct < 30 ? 'behind' : '';
+      const jobNum = r['job number'] || r['job#'] || r['job #'] || '—';
+      return `
+        <div class="job-row">
+          <div class="job-number">${jobNum}</div>
+          <div class="job-client">${r.client||'—'}</div>
+          <div class="job-due">${r['due date']||r.due||'—'}</div>
+          <div class="progress-wrap">
+            <div class="progress-bar"><div class="progress-fill ${pcls}" style="width:${pct}%"></div></div>
+            <div class="progress-pct">${pct}%</div>
+          </div>
+          <div style='display:flex;align-items:center;'>${statusBadge(r.status)}</div>
+        </div>`;
+    }).join('');
+    document.getElementById('jobs-updated').textContent =
+      new Date().toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'});
+  } catch(e) {
+    document.getElementById('jobs-rows').innerHTML = '<div class="empty-state">Could not load job data.</div>';
+  }
+}
+fetchJobs();
+setInterval(fetchJobs, 3 * 60 * 1000);
+
+/* ══════ SCREEN ROTATOR ══════ */
+// Flow: Announcements (cycle through all) → Jobs (JOBS_DURATION sec) → repeat
+const SCREENS = ['screen-announcements', 'screen-jobs'];
+let currentScreen = 0;
+
+function showScreen(idx) {
+  // hide current
+  const prev = document.getElementById(SCREENS[currentScreen]);
+  prev.classList.remove('active');
+
+  currentScreen = idx % SCREENS.length;
+
+  const next = document.getElementById(SCREENS[currentScreen]);
+  next.style.display = 'grid';
+  requestAnimationFrame(() => requestAnimationFrame(() => next.classList.add('active')));
+
+  if (currentScreen === 0) {
+    // Restart carousel from first card
+    scrollToAnn(0, false);
+    startCarousel();
+    // Schedule hand-off to jobs after all announcements have shown
+    const totalTime = Math.max(window._annPageCount || Math.ceil(annData.length / 2), 1) * SECS_PER_ANN * 1000;
+    setTimeout(() => showScreen(1), totalTime);
+  } else {
+    stopCarousel();
+    setTimeout(() => showScreen(0), JOBS_DURATION * 1000);
+  }
+}
+
+// Kick off once announcements are loaded (small delay to let fetch settle)
+setTimeout(() => {
+  scrollToAnn(0, false);
+  startCarousel();
+  const totalTime = Math.max(window._annPageCount || Math.ceil(annData.length / 2), 1) * SECS_PER_ANN * 1000;
+  setTimeout(() => showScreen(1), totalTime);
+}, 1500);
+
+/* ══════ TICKER ══════ */
+async function fetchTicker() {
+  try {
+    const r = { text: async () => await fetchCSV(TICKER_URL), ok: true };
+    const text = await r.text();
+    const rows = parseCSV(text);
+    const messages = rows.map(r => r.message || r.Message || Object.values(r)[0] || '').filter(Boolean);
+    if (!messages.length) return;
+    const combined = messages.join('     ·     ');
+    const el = document.getElementById('global-ticker');
+    if (el) {
+      el.textContent = combined;
+      const duration = Math.max(30, messages.length * 10) + 's';
+      el.style.animationDuration = duration;
+    }
+  } catch(e) {
+    console.log('Ticker fetch failed', e);
+  }
+}
+fetchTicker();
+setInterval(fetchTicker, 3 * 60 * 1000);
+</script>
+
+<!-- PERSISTENT TICKER — sits above both screens, never resets -->
+<div id="global-ticker-bar" style="
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: 56px;
+  background: #1a1e24;
+  border-top: 1px solid #2e343d;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  z-index: 999;
+  padding: 0 24px;
+  gap: 16px;
+">
+  <span style="font-size:13px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#1285D5; white-space:nowrap; flex-shrink:0;">UPDATES</span>
+  <div style="flex:1; overflow:hidden; position:relative;">
+    <div id="global-ticker" style="
+      display: inline-block;
+      white-space: nowrap;
+      font-size: 13px;
+      color: #B0BEC5;
+      animation: ticker-scroll 40s linear infinite;
+    "></div>
+  </div>
+  <div id="global-clock" style="
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 22px; font-weight: 600;
+    color: #FFFFFF; letter-spacing: 1px;
+    white-space: nowrap; flex-shrink: 0;
+  "></div>
+</div>
+</body>
+</html>
