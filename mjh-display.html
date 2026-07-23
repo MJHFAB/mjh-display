@@ -308,9 +308,10 @@
 
 <script>
 /* ══════ CONFIG ══════ */
-const ANNOUNCEMENTS_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQNKNe41oOT518N9wl57Bwhw3NXOvLxlPPB31QoBouaj8U8eksJpd0EFkuFtMSIE15h7TaXgGUcXCuL/pub?gid=0&single=true&output=csv";
-const JOBS_CSV          = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQNKNe41oOT518N9wl57Bwhw3NXOvLxlPPB31QoBouaj8U8eksJpd0EFkuFtMSIE15h7TaXgGUcXCuL/pub?gid=1375005608&single=true&output=csv";
-const TICKER_CSV        = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQNKNe41oOT518N9wl57Bwhw3NXOvLxlPPB31QoBouaj8U8eksJpd0EFkuFtMSIE15h7TaXgGUcXCuL/pub?gid=1977392702&single=true&output=csv";
+const PROXY = "https://corsproxy.io/?url=";
+const ANNOUNCEMENTS_CSV = PROXY + encodeURIComponent("https://docs.google.com/spreadsheets/d/e/2PACX-1vQNKNe41oOT518N9wl57Bwhw3NXOvLxlPPB31QoBouaj8U8eksJpd0EFkuFtMSIE15h7TaXgGUcXCuL/pub?gid=0&single=true&output=csv");
+const JOBS_CSV          = PROXY + encodeURIComponent("https://docs.google.com/spreadsheets/d/e/2PACX-1vQNKNe41oOT518N9wl57Bwhw3NXOvLxlPPB31QoBouaj8U8eksJpd0EFkuFtMSIE15h7TaXgGUcXCuL/pub?gid=1375005608&single=true&output=csv");
+const TICKER_CSV        = PROXY + encodeURIComponent("https://docs.google.com/spreadsheets/d/e/2PACX-1vQNKNe41oOT518N9wl57Bwhw3NXOvLxlPPB31QoBouaj8U8eksJpd0EFkuFtMSIE15h7TaXgGUcXCuL/pub?gid=1977392702&single=true&output=csv");
 const SECS_PER_ANN      = 6;   // seconds each announcement is shown
 const JOBS_DURATION     = 20;  // seconds job status screen shows
 
