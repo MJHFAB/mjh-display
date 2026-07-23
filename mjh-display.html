@@ -11,10 +11,8 @@
 
   :root {
     --blue: #1285D5;
-    --blue-dark: #0d6aad;
     --dark: #18191c;
     --panel: #212429;
-    --panel2: #292d33;
     --border: #2e343d;
     --text: #f0f4f8;
     --text-dim: #9aa5b1;
@@ -32,9 +30,7 @@
     color: var(--text);
   }
 
-  /* ══════════════════════════════
-     SHARED LAYOUT
-  ══════════════════════════════ */
+  /* ══════ SCREENS ══════ */
   .screen {
     width: 1280px; height: 720px;
     display: none;
@@ -44,10 +40,7 @@
     opacity: 0;
     transition: opacity 0.7s ease;
   }
-  .screen.active {
-    display: grid;
-    opacity: 1;
-  }
+  .screen.active { display: grid; opacity: 1; }
   .screen::before {
     content: '';
     position: absolute;
@@ -57,9 +50,7 @@
     z-index: 10;
   }
 
-  /* ══════════════════════════════
-     HEADER
-  ══════════════════════════════ */
+  /* ══════ HEADER ══════ */
   header {
     display: flex;
     align-items: center;
@@ -87,9 +78,7 @@
     font-size: 18px; font-weight: 600; color: var(--text); margin-top: 2px;
   }
 
-  /* ══════════════════════════════
-     FOOTER
-  ══════════════════════════════ */
+  /* ══════ FOOTER ══════ */
   footer {
     display: flex; align-items: center; justify-content: space-between;
     padding: 0 44px 0 48px;
@@ -110,41 +99,32 @@
   .footer-ticker { font-size: 12px; color: #7a8694; font-style: italic; }
   .footer-clock {
     font-family: 'Barlow Condensed', sans-serif;
-    font-size: 20px; font-weight: 600; color: var(--text);
-    letter-spacing: 1px;
+    font-size: 20px; font-weight: 600; color: var(--text); letter-spacing: 1px;
   }
 
-  /* ══════════════════════════════
-     SLIDE DOTS
-  ══════════════════════════════ */
-  .slide-dots {
-    position: fixed; bottom: 16px; left: 50%;
-    transform: translateX(-50%);
-    display: flex; gap: 8px; z-index: 100;
+  /* ══════ ANNOUNCEMENT CAROUSEL ══════ */
+  .ann-viewport {
+    overflow: hidden;
+    position: relative;
+    padding: 0 48px;
+    display: flex;
+    align-items: center;
   }
-  .dot {
-    width: 28px; height: 4px; border-radius: 2px;
-    background: var(--border);
-    transition: background 0.4s, width 0.4s;
+  .ann-track {
+    display: flex;
+    gap: 24px;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
   }
-  .dot.active { background: var(--blue); width: 40px; }
-
-  /* ══════════════════════════════
-     ANNOUNCEMENT CARDS
-  ══════════════════════════════ */
-  .ann-content {
-    padding: 22px 44px 22px 48px;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 18px;
-  }
-  .card {
+  .ann-card {
     background: var(--panel);
     border: 1px solid var(--border);
     border-radius: 8px;
     overflow: hidden;
-    display: flex; flex-direction: column;
-    height: 100%;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    /* width set by JS based on count */
   }
   .card-accent { height: 4px; flex-shrink: 0; }
   .ca-hours   { background: var(--purple); }
@@ -153,7 +133,7 @@
   .ca-safety  { background: var(--red); }
   .ca-info    { background: var(--blue); }
 
-  .card-inner { padding: 18px 20px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+  .card-inner { padding: 20px 22px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
   .card-tag {
     display: inline-flex; align-items: center; gap: 6px;
     font-size: 10px; font-weight: 600;
@@ -168,20 +148,31 @@
 
   .card-title {
     font-family: 'Barlow Condensed', sans-serif;
-    font-size: 21px; font-weight: 700;
+    font-size: 24px; font-weight: 700;
     text-transform: uppercase; letter-spacing: 0.5px;
     color: var(--text); line-height: 1.15;
   }
-  .card-body { font-size: 14px; color: #c5cdd6; line-height: 1.6; flex: 1; }
+  .card-body { font-size: 15px; color: #c5cdd6; line-height: 1.65; flex: 1; }
   .card-footer {
     margin-top: 10px; padding-top: 10px;
     border-top: 1px solid var(--border);
     font-size: 11px; color: var(--text-dim);
   }
 
-  /* ══════════════════════════════
-     JOB STATUS TABLE
-  ══════════════════════════════ */
+  /* carousel dots */
+  .ann-dots {
+    display: flex; justify-content: center; align-items: center;
+    gap: 6px; padding: 8px 0 0;
+    flex-shrink: 0;
+  }
+  .ann-dot {
+    width: 20px; height: 3px; border-radius: 2px;
+    background: var(--border);
+    transition: background 0.3s, width 0.3s;
+  }
+  .ann-dot.active { background: var(--blue); width: 32px; }
+
+  /* ══════ JOB STATUS ══════ */
   .jobs-content {
     padding: 20px 44px 20px 48px;
     display: flex; flex-direction: column; gap: 10px;
@@ -215,16 +206,9 @@
   .job-client { font-size: 14px; color: var(--text); font-weight: 500; }
   .job-due { font-size: 13px; color: var(--text-dim); }
   .progress-wrap { display: flex; flex-direction: column; gap: 4px; }
-  .progress-bar {
-    background: var(--border);
-    border-radius: 3px; height: 6px; overflow: hidden;
-  }
-  .progress-fill {
-    height: 100%; border-radius: 3px;
-    background: var(--blue);
-    transition: width 1s ease;
-  }
-  .progress-fill.done { background: var(--green); }
+  .progress-bar { background: var(--border); border-radius: 3px; height: 6px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 3px; background: var(--blue); transition: width 1s ease; }
+  .progress-fill.done   { background: var(--green); }
   .progress-fill.behind { background: var(--amber); }
   .progress-pct { font-size: 11px; color: var(--text-dim); }
   .status-badge {
@@ -236,25 +220,28 @@
   .sb-review   { background: #3d2a00; color: #FFB300; }
   .sb-complete { background: #1a3d1a; color: #66BB6A; }
   .sb-hold     { background: #3a2020; color: #EF9A9A; }
-  .sb-ahead    { background: #0d3a6e; color: #64B5F6; }
-
-  .jobs-updated {
-    font-size: 11px; color: var(--text-dim);
-    text-align: center; margin-top: 4px;
-    font-style: italic;
-  }
   .empty-state {
     font-size: 14px; color: var(--text-dim);
-    text-align: center; padding: 40px;
-    font-style: italic;
+    text-align: center; padding: 40px; font-style: italic;
   }
+
+  /* ══════ SLIDE DOTS ══════ */
+  .slide-dots {
+    position: fixed; bottom: 16px; left: 50%;
+    transform: translateX(-50%);
+    display: flex; gap: 8px; z-index: 100;
+  }
+  .sdot {
+    width: 28px; height: 4px; border-radius: 2px;
+    background: var(--border);
+    transition: background 0.4s, width 0.4s;
+  }
+  .sdot.active { background: var(--blue); width: 40px; }
 </style>
 </head>
 <body>
 
-<!-- ══════════════════════════════
-     SCREEN 1: ANNOUNCEMENTS
-══════════════════════════════ -->
+<!-- ══════ SCREEN 1: ANNOUNCEMENTS ══════ -->
 <div class="screen active" id="screen-announcements">
   <header>
     <div class="logo"><img src="mjh-logo-white2.png" alt="MJ&H Fabrication"></div>
@@ -268,8 +255,11 @@
     </div>
   </header>
 
-  <div class="ann-content" id="ann-cards">
-    <div class="empty-state">Loading announcements...</div>
+  <div style="display:flex; flex-direction:column; overflow:hidden;">
+    <div class="ann-viewport" id="ann-viewport">
+      <div class="ann-track" id="ann-track"></div>
+    </div>
+    <div class="ann-dots" id="ann-dots"></div>
   </div>
 
   <footer>
@@ -279,9 +269,7 @@
   </footer>
 </div>
 
-<!-- ══════════════════════════════
-     SCREEN 2: JOB STATUS
-══════════════════════════════ -->
+<!-- ══════ SCREEN 2: JOB STATUS ══════ -->
 <div class="screen" id="screen-jobs">
   <header>
     <div class="logo"><img src="mjh-logo-white2.png" alt="MJ&H Fabrication"></div>
@@ -297,15 +285,9 @@
 
   <div class="jobs-content">
     <div class="jobs-header">
-      <span>Job #</span>
-      <span>Client</span>
-      <span>Due Date</span>
-      <span>Progress</span>
-      <span>Status</span>
+      <span>Job #</span><span>Client</span><span>Due Date</span><span>Progress</span><span>Status</span>
     </div>
-    <div id="jobs-rows">
-      <div class="empty-state">Loading job data...</div>
-    </div>
+    <div id="jobs-rows"><div class="empty-state">Loading job data...</div></div>
   </div>
 
   <footer>
@@ -315,63 +297,55 @@
   </footer>
 </div>
 
-<!-- SLIDE DOTS -->
+<!-- SCREEN DOTS -->
 <div class="slide-dots">
-  <div class="dot active" id="dot-0"></div>
-  <div class="dot" id="dot-1"></div>
+  <div class="sdot active" id="sdot-0"></div>
+  <div class="sdot" id="sdot-1"></div>
 </div>
 
 <script>
-/* ══════════════════════════════
-   CONFIG
-══════════════════════════════ */
+/* ══════ CONFIG ══════ */
 const ANNOUNCEMENTS_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQNKNe41oOT518N9wl57Bwhw3NXOvLxlPPB31QoBouaj8U8eksJpd0EFkuFtMSIE15h7TaXgGUcXCuL/pub?gid=0&single=true&output=csv";
 const JOBS_CSV          = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQNKNe41oOT518N9wl57Bwhw3NXOvLxlPPB31QoBouaj8U8eksJpd0EFkuFtMSIE15h7TaXgGUcXCuL/pub?gid=1375005608&single=true&output=csv";
-const SLIDE_SECONDS     = 20;
-const ANN_PER_PAGE      = 3;
+const SECS_PER_ANN      = 6;   // seconds each announcement is shown
+const JOBS_DURATION     = 20;  // seconds job status screen shows
 
-/* ══════════════════════════════
-   CLOCK
-══════════════════════════════ */
+/* ══════ CLOCK ══════ */
 function updateClock() {
   const now = new Date();
   const h = now.getHours(), m = now.getMinutes();
   const ampm = h >= 12 ? 'PM' : 'AM';
-  const h12 = h % 12 || 12;
-  const str = `${h12}:${String(m).padStart(2,'0')} ${ampm}`;
+  const str = `${h%12||12}:${String(m).padStart(2,'0')} ${ampm}`;
   document.getElementById('clock1').textContent = str;
   document.getElementById('clock2').textContent = str;
 }
 setInterval(updateClock, 1000);
 updateClock();
 
-/* ══════════════════════════════
-   CSV PARSER
-══════════════════════════════ */
+/* ══════ CSV PARSER ══════ */
 function parseCSV(text) {
   const lines = text.trim().split('\n');
   const headers = lines[0].split(',').map(h => h.replace(/^"|"$/g,'').trim().toLowerCase());
   return lines.slice(1).map(line => {
     const vals = [];
-    let inQuote = false, cur = '';
+    let inQ = false, cur = '';
     for (let c of line) {
-      if (c === '"') { inQuote = !inQuote; }
-      else if (c === ',' && !inQuote) { vals.push(cur.trim()); cur = ''; }
+      if (c === '"') { inQ = !inQ; }
+      else if (c === ',' && !inQ) { vals.push(cur.trim()); cur = ''; }
       else cur += c;
     }
     vals.push(cur.trim());
     const obj = {};
-    headers.forEach((h, i) => obj[h] = (vals[i] || '').replace(/^"|"$/g,'').trim());
+    headers.forEach((h, i) => obj[h] = (vals[i]||'').replace(/^"|"$/g,'').trim());
     return obj;
   }).filter(r => Object.values(r).some(v => v));
 }
 
-/* ══════════════════════════════
-   ANNOUNCEMENTS
-══════════════════════════════ */
+/* ══════ ANNOUNCEMENTS CAROUSEL ══════ */
 let annData = [];
-let annPage = 0;
-let annPageCount = 1;
+let annIndex = 0;
+let annTimer = null;
+let carouselRunning = false;
 
 function categoryClass(cat) {
   const c = (cat||'').toLowerCase();
@@ -382,14 +356,19 @@ function categoryClass(cat) {
   return 'info';
 }
 
-function renderAnnPage(page) {
-  const start = page * ANN_PER_PAGE;
-  const slice = annData.slice(start, start + ANN_PER_PAGE);
-  const container = document.getElementById('ann-cards');
-  container.innerHTML = slice.map(r => {
+function buildCarousel() {
+  const track = document.getElementById('ann-track');
+  const dots  = document.getElementById('ann-dots');
+  const vp    = document.getElementById('ann-viewport');
+
+  // card width: fill viewport with slight peek of next card
+  const vpWidth = vp.clientWidth || 1184;
+  const cardWidth = vpWidth - 48; // slight right peek
+
+  track.innerHTML = annData.map((r, i) => {
     const cls = categoryClass(r.category);
     return `
-      <div class="card">
+      <div class="ann-card" style="width:${cardWidth}px; min-height: 480px;">
         <div class="card-accent ca-${cls}"></div>
         <div class="card-inner">
           <span class="card-tag ct-${cls}">${r.category || 'Info'}</span>
@@ -399,13 +378,46 @@ function renderAnnPage(page) {
         </div>
       </div>`;
   }).join('');
+
+  dots.innerHTML = annData.map((_, i) =>
+    `<div class="ann-dot${i===0?' active':''}" id="adot-${i}"></div>`
+  ).join('');
+
+  scrollToAnn(0, false);
 }
 
-function tickerFromAnn() {
-  if (!annData.length) return '';
-  const notices = annData.filter(r => (r.category||'').toLowerCase() === 'notice');
-  const pick = notices.length ? notices[0] : annData[0];
-  return `📋 ${pick.title}`;
+function scrollToAnn(idx, animate = true) {
+  const vp    = document.getElementById('ann-viewport');
+  const track = document.getElementById('ann-track');
+  const vpWidth = vp.clientWidth || 1184;
+  const cardWidth = vpWidth - 48;
+
+  if (!animate) track.style.transition = 'none';
+  else track.style.transition = 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+
+  track.style.transform = `translateX(-${idx * (cardWidth + 24)}px)`;
+
+  document.querySelectorAll('.ann-dot').forEach((d, i) => {
+    d.classList.toggle('active', i === idx);
+  });
+
+  annIndex = idx;
+}
+
+function startCarousel() {
+  if (annTimer) clearInterval(annTimer);
+  carouselRunning = true;
+  annTimer = setInterval(() => {
+    if (!carouselRunning) return;
+    const next = (annIndex + 1) % annData.length;
+    scrollToAnn(next);
+  }, SECS_PER_ANN * 1000);
+}
+
+function stopCarousel() {
+  carouselRunning = false;
+  if (annTimer) clearInterval(annTimer);
+  annTimer = null;
 }
 
 async function fetchAnnouncements() {
@@ -413,42 +425,33 @@ async function fetchAnnouncements() {
     const r = await fetch(ANNOUNCEMENTS_CSV);
     const text = await r.text();
     annData = parseCSV(text);
-    annPageCount = Math.max(1, Math.ceil(annData.length / ANN_PER_PAGE));
-    renderAnnPage(annPage % annPageCount);
+    buildCarousel();
     const now = new Date();
-    document.getElementById('ann-updated').textContent = now.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
-    document.getElementById('ann-ticker').textContent = tickerFromAnn();
+    document.getElementById('ann-updated').textContent =
+      now.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+    const notice = annData.find(r => (r.category||'').toLowerCase() === 'notice') || annData[0];
+    if (notice) document.getElementById('ann-ticker').textContent = `📋 ${notice.title}`;
   } catch(e) {
-    document.getElementById('ann-cards').innerHTML = '<div class="empty-state">Could not load announcements — check back shortly.</div>';
+    document.getElementById('ann-track').innerHTML = '<div class="empty-state">Could not load announcements.</div>';
   }
 }
 fetchAnnouncements();
 setInterval(fetchAnnouncements, 5 * 60 * 1000);
 
-/* ══════════════════════════════
-   JOB STATUS
-══════════════════════════════ */
+/* ══════ JOB STATUS ══════ */
 function statusBadge(s) {
   const map = {
-    'active':   ['sb-active',   'In Progress'],
-    'in progress': ['sb-active','In Progress'],
-    'review':   ['sb-review',   'In Review'],
-    'in review':['sb-review',   'In Review'],
-    'complete': ['sb-complete', 'Complete'],
-    'done':     ['sb-complete', 'Complete'],
-    'hold':     ['sb-hold',     'On Hold'],
-    'on hold':  ['sb-hold',     'On Hold'],
-    'ahead':    ['sb-ahead',    'Ahead'],
+    'active':      ['sb-active',   'In Progress'],
+    'in progress': ['sb-active',   'In Progress'],
+    'review':      ['sb-review',   'In Review'],
+    'in review':   ['sb-review',   'In Review'],
+    'complete':    ['sb-complete', 'Complete'],
+    'done':        ['sb-complete', 'Complete'],
+    'hold':        ['sb-hold',     'On Hold'],
+    'on hold':     ['sb-hold',     'On Hold'],
   };
-  const key = (s||'active').toLowerCase();
-  const [cls, label] = map[key] || ['sb-active','In Progress'];
+  const [cls, label] = map[(s||'').toLowerCase()] || ['sb-active','In Progress'];
   return `<span class="status-badge ${cls}">${label}</span>`;
-}
-
-function progressClass(pct, status) {
-  if ((status||'').toLowerCase().includes('complete') || (status||'').toLowerCase() === 'done') return 'done';
-  if (pct < 30) return 'behind';
-  return '';
 }
 
 async function fetchJobs() {
@@ -462,13 +465,15 @@ async function fetchJobs() {
       return;
     }
     container.innerHTML = rows.map(r => {
-      const pct = Math.min(100, Math.max(0, parseInt(r.progress) || 0));
-      const pcls = progressClass(pct, r.status);
+      const pct = Math.min(100, Math.max(0, parseInt(r.progress)||0));
+      const st  = (r.status||'').toLowerCase();
+      const pcls = st.includes('complete')||st==='done' ? 'done' : pct < 30 ? 'behind' : '';
+      const jobNum = r['job number'] || r['job#'] || r['job #'] || '—';
       return `
         <div class="job-row">
-          <div class="job-number">${r['job number'] || r['job#'] || r['job #'] || '—'}</div>
-          <div class="job-client">${r.client || '—'}</div>
-          <div class="job-due">${r['due date'] || r.due || '—'}</div>
+          <div class="job-number">${jobNum}</div>
+          <div class="job-client">${r.client||'—'}</div>
+          <div class="job-due">${r['due date']||r.due||'—'}</div>
           <div class="progress-wrap">
             <div class="progress-bar"><div class="progress-fill ${pcls}" style="width:${pct}%"></div></div>
             <div class="progress-pct">${pct}%</div>
@@ -476,43 +481,53 @@ async function fetchJobs() {
           <div>${statusBadge(r.status)}</div>
         </div>`;
     }).join('');
-    const now = new Date();
-    document.getElementById('jobs-updated').textContent = now.toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'});
+    document.getElementById('jobs-updated').textContent =
+      new Date().toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'});
   } catch(e) {
-    document.getElementById('jobs-rows').innerHTML = '<div class="empty-state">Could not load job data — check back shortly.</div>';
+    document.getElementById('jobs-rows').innerHTML = '<div class="empty-state">Could not load job data.</div>';
   }
 }
 fetchJobs();
 setInterval(fetchJobs, 3 * 60 * 1000);
 
-/* ══════════════════════════════
-   SLIDE ROTATOR
-══════════════════════════════ */
-const screens = ['screen-announcements', 'screen-jobs'];
+/* ══════ SCREEN ROTATOR ══════ */
+// Flow: Announcements (cycle through all) → Jobs (JOBS_DURATION sec) → repeat
+const SCREENS = ['screen-announcements', 'screen-jobs'];
 let currentScreen = 0;
 
-function goTo(n) {
-  document.getElementById(screens[currentScreen]).classList.remove('active');
-  document.getElementById(`dot-${currentScreen}`).classList.remove('active');
+function showScreen(idx) {
+  // hide current
+  const prev = document.getElementById(SCREENS[currentScreen]);
+  prev.classList.remove('active');
+  document.getElementById(`sdot-${currentScreen}`).classList.remove('active');
 
-  // If we're leaving announcements, advance the page for next time
+  currentScreen = idx % SCREENS.length;
+
+  const next = document.getElementById(SCREENS[currentScreen]);
+  next.style.display = 'grid';
+  requestAnimationFrame(() => requestAnimationFrame(() => next.classList.add('active')));
+  document.getElementById(`sdot-${currentScreen}`).classList.add('active');
+
   if (currentScreen === 0) {
-    annPage = (annPage + 1) % annPageCount;
+    // Restart carousel from first card
+    scrollToAnn(0, false);
+    startCarousel();
+    // Schedule hand-off to jobs after all announcements have shown
+    const totalTime = annData.length * SECS_PER_ANN * 1000;
+    setTimeout(() => showScreen(1), totalTime);
+  } else {
+    stopCarousel();
+    setTimeout(() => showScreen(0), JOBS_DURATION * 1000);
   }
-
-  currentScreen = n % screens.length;
-  const el = document.getElementById(screens[currentScreen]);
-  el.style.display = 'grid';
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => el.classList.add('active'));
-  });
-  document.getElementById(`dot-${currentScreen}`).classList.add('active');
-
-  // Re-render announcements on page advance
-  if (currentScreen === 0) renderAnnPage(annPage);
 }
 
-setInterval(() => goTo(currentScreen + 1), SLIDE_SECONDS * 1000);
+// Kick off once announcements are loaded (small delay to let fetch settle)
+setTimeout(() => {
+  scrollToAnn(0, false);
+  startCarousel();
+  const totalTime = Math.max(annData.length, 1) * SECS_PER_ANN * 1000;
+  setTimeout(() => showScreen(1), totalTime);
+}, 1500);
 </script>
 </body>
 </html>
