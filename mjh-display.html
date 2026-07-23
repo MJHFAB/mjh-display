@@ -385,8 +385,11 @@ function buildCarousel() {
   const dots  = document.getElementById('ann-dots');
   const vp    = document.getElementById('ann-viewport');
 
+  if (!track || !dots || !vp) { console.error('Carousel elements not found'); return; }
+
   // Show 2 cards per page — pair them up
-  const vpWidth = vp.clientWidth || window.innerWidth - 96;
+  const vpWidth = vp.offsetWidth || window.innerWidth - 96;
+  console.log('BUILD CAROUSEL vpWidth:', vpWidth, 'annData:', annData.length);
   const gap = 20;
   const cardWidth = (vpWidth - gap) / 2;
 
@@ -428,7 +431,7 @@ function buildCarousel() {
 function scrollToAnn(idx, animate = true) {
   const vp    = document.getElementById('ann-viewport');
   const track = document.getElementById('ann-track');
-  const vpWidth = vp.clientWidth || window.innerWidth - 96;
+  const vpWidth = vp.offsetWidth || window.innerWidth - 96;
 
   if (!animate) track.style.transition = 'none';
   else track.style.transition = 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
@@ -476,7 +479,7 @@ async function fetchAnnouncements() {
     document.getElementById('ann-track').innerHTML = '<div class="empty-state">Could not load announcements.</div>';
   }
 }
-fetchAnnouncements();
+setTimeout(fetchAnnouncements, 300);
 setInterval(fetchAnnouncements, 3 * 60 * 1000);
 
 /* ══════ JOB STATUS ══════ */
