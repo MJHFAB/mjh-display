@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MJ&H Fabrication — Shop Display</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@300;400;500;600&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --blue: #1285D5;
+    --blue-dark: #0d6aad;
+    --dark: #18191c;
+    --panel: #212429;
+    --panel2: #292d33;
+    --border: #2e343d;
+    --text: #f0f4f8;
+    --text-dim: #9aa5b1;
+    --amber: #F59E0B;
+    --green: #10B981;
+    --purple: #8B5CF6;
+    --red: #EF4444;
+  }
+
+  html, body {
+    width: 1280px; height: 720px;
+    overflow: hidden;
+    background: var(--dark);
+    font-family: 'Barlow', sans-serif;
+    color: var(--text);
+  }
+
+  /* ══════════════════════════════
+     SHARED LAYOUT
+  ══════════════════════════════ */
+  .screen {
+    width: 1280px; height: 720px;
+    display: none;
+    grid-template-rows: 88px 1fr 52px;
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.7s ease;
+  }
+  .screen.active {
+    display: grid;
+    opacity: 1;
+  }
+  .screen::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    background: var(--blue);
+    z-index: 10;
+  }
+
+  /* ══════════════════════════════
+     HEADER
+  ══════════════════════════════ */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 44px 0 48px;
+    background: var(--panel);
+    border-bottom: 3px solid var(--blue);
+  }
+  .logo img { height: 52px; width: auto; display: block; }
+  .header-center { text-align: center; }
+  .slide-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 30px; font-weight: 700;
+    letter-spacing: 3px; text-transform: uppercase;
+    color: var(--text); line-height: 1;
+  }
+  .slide-sub {
+    font-size: 11px; color: var(--text-dim);
+    letter-spacing: 2px; text-transform: uppercase; margin-top: 4px;
+  }
+  .header-right { text-align: right; }
+  .date-label { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1.5px; }
+  .date-value {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 18px; font-weight: 600; color: var(--text); margin-top: 2px;
+  }
+
+  /* ══════════════════════════════
+     FOOTER
+  ══════════════════════════════ */
+  footer {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 44px 0 48px;
+    background: var(--panel);
+    border-top: 1px solid var(--border);
+  }
+  .footer-brand {
+    font-size: 11px; color: var(--text-dim);
+    letter-spacing: 1px; text-transform: uppercase;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .live-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--blue);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.25} }
+  .footer-ticker { font-size: 12px; color: #7a8694; font-style: italic; }
+  .footer-clock {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 20px; font-weight: 600; color: var(--text);
+    letter-spacing: 1px;
+  }
+
+  /* ══════════════════════════════
+     SLIDE DOTS
+  ══════════════════════════════ */
+  .slide-dots {
+    position: fixed; bottom: 16px; left: 50%;
+    transform: translateX(-50%);
+    display: flex; gap: 8px; z-index: 100;
+  }
+  .dot {
+    width: 28px; height: 4px; border-radius: 2px;
+    background: var(--border);
+    transition: background 0.4s, width 0.4s;
+  }
+  .dot.active { background: var(--blue); width: 40px; }
+
+  /* ══════════════════════════════
+     ANNOUNCEMENT CARDS
+  ══════════════════════════════ */
+  .ann-content {
+    padding: 22px 44px 22px 48px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    height: 100%;
+  }
+  .card-accent { height: 4px; flex-shrink: 0; }
+  .ca-hours   { background: var(--purple); }
+  .ca-notice  { background: var(--amber); }
+  .ca-event   { background: var(--green); }
+  .ca-safety  { background: var(--red); }
+  .ca-info    { background: var(--blue); }
+
+  .card-inner { padding: 18px 20px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+  .card-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 10px; font-weight: 600;
+    letter-spacing: 1.5px; text-transform: uppercase;
+  }
+  .card-tag::before { content:''; width:6px; height:6px; border-radius:50%; background:currentColor; flex-shrink:0; }
+  .ct-hours  { color: var(--purple); }
+  .ct-notice { color: var(--amber); }
+  .ct-event  { color: var(--green); }
+  .ct-safety { color: var(--red); }
+  .ct-info   { color: var(--blue); }
+
+  .card-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 21px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    color: var(--text); line-height: 1.15;
+  }
+  .card-body { font-size: 14px; color: #c5cdd6; line-height: 1.6; flex: 1; }
+  .card-footer {
+    margin-top: 10px; padding-top: 10px;
+    border-top: 1px solid var(--border);
+    font-size: 11px; color: var(--text-dim);
+  }
+
+  /* ══════════════════════════════
+     JOB STATUS TABLE
+  ══════════════════════════════ */
+  .jobs-content {
+    padding: 20px 44px 20px 48px;
+    display: flex; flex-direction: column; gap: 10px;
+    overflow: hidden;
+  }
+  .jobs-header {
+    display: grid;
+    grid-template-columns: 1fr 1.6fr 1fr 1.4fr 1fr;
+    gap: 12px;
+    padding: 6px 16px;
+    font-size: 10px; font-weight: 600;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--text-dim);
+    border-bottom: 1px solid var(--border);
+  }
+  .job-row {
+    display: grid;
+    grid-template-columns: 1fr 1.6fr 1fr 1.4fr 1fr;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    align-items: center;
+  }
+  .job-number {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 17px; font-weight: 700;
+    color: var(--blue); letter-spacing: 1px;
+  }
+  .job-client { font-size: 14px; color: var(--text); font-weight: 500; }
+  .job-due { font-size: 13px; color: var(--text-dim); }
+  .progress-wrap { display: flex; flex-direction: column; gap: 4px; }
+  .progress-bar {
+    background: var(--border);
+    border-radius: 3px; height: 6px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; border-radius: 3px;
+    background: var(--blue);
+    transition: width 1s ease;
+  }
+  .progress-fill.done { background: var(--green); }
+  .progress-fill.behind { background: var(--amber); }
+  .progress-pct { font-size: 11px; color: var(--text-dim); }
+  .status-badge {
+    display: inline-block; padding: 3px 10px;
+    border-radius: 3px; font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 1px;
+  }
+  .sb-active   { background: #0d3a6e; color: #64B5F6; }
+  .sb-review   { background: #3d2a00; color: #FFB300; }
+  .sb-complete { background: #1a3d1a; color: #66BB6A; }
+  .sb-hold     { background: #3a2020; color: #EF9A9A; }
+  .sb-ahead    { background: #0d3a6e; color: #64B5F6; }
+
+  .jobs-updated {
+    font-size: 11px; color: var(--text-dim);
+    text-align: center; margin-top: 4px;
+    font-style: italic;
+  }
+  .empty-state {
+    font-size: 14px; color: var(--text-dim);
+    text-align: center; padding: 40px;
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════
+     SCREEN 1: ANNOUNCEMENTS
+══════════════════════════════ -->
+<div class="screen active" id="screen-announcements">
+  <header>
+    <div class="logo"><img src="mjh-logo-color.png" alt="MJ&H Fabrication"></div>
+    <div class="header-center">
+      <div class="slide-title">Announcements</div>
+      <div class="slide-sub">MJ&H Fabrication, Inc.</div>
+    </div>
+    <div class="header-right">
+      <div class="date-label">Last Updated</div>
+      <div class="date-value" id="ann-updated">—</div>
+    </div>
+  </header>
+
+  <div class="ann-content" id="ann-cards">
+    <div class="empty-state">Loading announcements...</div>
+  </div>
+
+  <footer>
+    <div class="footer-brand"><div class="live-dot"></div>MJ&H Fabrication, Inc. — Ponca City, OK</div>
+    <div class="footer-ticker" id="ann-ticker"></div>
+    <div class="footer-clock" id="clock1"></div>
+  </footer>
+</div>
+
+<!-- ══════════════════════════════
+     SCREEN 2: JOB STATUS
+══════════════════════════════ -->
+<div class="screen" id="screen-jobs">
+  <header>
+    <div class="logo"><img src="mjh-logo-color.png" alt="MJ&H Fabrication"></div>
+    <div class="header-center">
+      <div class="slide-title">Current Jobs</div>
+      <div class="slide-sub">Project Status Board</div>
+    </div>
+    <div class="header-right">
+      <div class="date-label">Last Synced</div>
+      <div class="date-value" id="jobs-updated">—</div>
+    </div>
+  </header>
+
+  <div class="jobs-content">
+    <div class="jobs-header">
+      <span>Job #</span>
+      <span>Client</span>
+      <span>Due Date</span>
+      <span>Progress</span>
+      <span>Status</span>
+    </div>
+    <div id="jobs-rows">
+      <div class="empty-state">Loading job data...</div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-brand"><div class="live-dot"></div>MJ&H Fabrication, Inc. — Ponca City, OK</div>
+    <div class="footer-ticker">📋 Safety Meeting every Tuesday at 2:30pm in the breakroom</div>
+    <div class="footer-clock" id="clock2"></div>
+  </footer>
+</div>
+
+<!-- SLIDE DOTS -->
+<div class="slide-dots">
+  <div class="dot active" id="dot-0"></div>
+  <div class="dot" id="dot-1"></div>
+</div>
+
+<script>
+/* ══════════════════════════════
+   CONFIG
+══════════════════════════════ */
+const ANNOUNCEMENTS_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQNKNe41oOT518N9wl57Bwhw3NXOvLxlPPB31QoBouaj8U8eksJpd0EFkuFtMSIE15h7TaXgGUcXCuL/pub?gid=0&single=true&output=csv";
+const JOBS_CSV          = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQNKNe41oOT518N9wl57Bwhw3NXOvLxlPPB31QoBouaj8U8eksJpd0EFkuFtMSIE15h7TaXgGUcXCuL/pub?gid=1375005608&single=true&output=csv";
+const SLIDE_SECONDS     = 20;
+const ANN_PER_PAGE      = 3;
+
+/* ══════════════════════════════
+   CLOCK
+══════════════════════════════ */
+function updateClock() {
+  const now = new Date();
+  const h = now.getHours(), m = now.getMinutes();
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  const h12 = h % 12 || 12;
+  const str = `${h12}:${String(m).padStart(2,'0')} ${ampm}`;
+  document.getElementById('clock1').textContent = str;
+  document.getElementById('clock2').textContent = str;
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+/* ══════════════════════════════
+   CSV PARSER
+══════════════════════════════ */
+function parseCSV(text) {
+  const lines = text.trim().split('\n');
+  const headers = lines[0].split(',').map(h => h.replace(/^"|"$/g,'').trim().toLowerCase());
+  return lines.slice(1).map(line => {
+    const vals = [];
+    let inQuote = false, cur = '';
+    for (let c of line) {
+      if (c === '"') { inQuote = !inQuote; }
+      else if (c === ',' && !inQuote) { vals.push(cur.trim()); cur = ''; }
+      else cur += c;
+    }
+    vals.push(cur.trim());
+    const obj = {};
+    headers.forEach((h, i) => obj[h] = (vals[i] || '').replace(/^"|"$/g,'').trim());
+    return obj;
+  }).filter(r => Object.values(r).some(v => v));
+}
+
+/* ══════════════════════════════
+   ANNOUNCEMENTS
+══════════════════════════════ */
+let annData = [];
+let annPage = 0;
+let annPageCount = 1;
+
+function categoryClass(cat) {
+  const c = (cat||'').toLowerCase();
+  if (c === 'hours')  return 'hours';
+  if (c === 'notice') return 'notice';
+  if (c === 'event')  return 'event';
+  if (c === 'safety') return 'safety';
+  return 'info';
+}
+
+function renderAnnPage(page) {
+  const start = page * ANN_PER_PAGE;
+  const slice = annData.slice(start, start + ANN_PER_PAGE);
+  const container = document.getElementById('ann-cards');
+  container.innerHTML = slice.map(r => {
+    const cls = categoryClass(r.category);
+    return `
+      <div class="card">
+        <div class="card-accent ca-${cls}"></div>
+        <div class="card-inner">
+          <span class="card-tag ct-${cls}">${r.category || 'Info'}</span>
+          <div class="card-title">${r.title || ''}</div>
+          <div class="card-body">${r.body || ''}</div>
+          ${r.footer ? `<div class="card-footer">${r.footer}</div>` : ''}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function tickerFromAnn() {
+  if (!annData.length) return '';
+  const notices = annData.filter(r => (r.category||'').toLowerCase() === 'notice');
+  const pick = notices.length ? notices[0] : annData[0];
+  return `📋 ${pick.title}`;
+}
+
+async function fetchAnnouncements() {
+  try {
+    const r = await fetch(ANNOUNCEMENTS_CSV);
+    const text = await r.text();
+    annData = parseCSV(text);
+    annPageCount = Math.max(1, Math.ceil(annData.length / ANN_PER_PAGE));
+    renderAnnPage(annPage % annPageCount);
+    const now = new Date();
+    document.getElementById('ann-updated').textContent = now.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+    document.getElementById('ann-ticker').textContent = tickerFromAnn();
+  } catch(e) {
+    document.getElementById('ann-cards').innerHTML = '<div class="empty-state">Could not load announcements — check back shortly.</div>';
+  }
+}
+fetchAnnouncements();
+setInterval(fetchAnnouncements, 5 * 60 * 1000);
+
+/* ══════════════════════════════
+   JOB STATUS
+══════════════════════════════ */
+function statusBadge(s) {
+  const map = {
+    'active':   ['sb-active',   'In Progress'],
+    'in progress': ['sb-active','In Progress'],
+    'review':   ['sb-review',   'In Review'],
+    'in review':['sb-review',   'In Review'],
+    'complete': ['sb-complete', 'Complete'],
+    'done':     ['sb-complete', 'Complete'],
+    'hold':     ['sb-hold',     'On Hold'],
+    'on hold':  ['sb-hold',     'On Hold'],
+    'ahead':    ['sb-ahead',    'Ahead'],
+  };
+  const key = (s||'active').toLowerCase();
+  const [cls, label] = map[key] || ['sb-active','In Progress'];
+  return `<span class="status-badge ${cls}">${label}</span>`;
+}
+
+function progressClass(pct, status) {
+  if ((status||'').toLowerCase().includes('complete') || (status||'').toLowerCase() === 'done') return 'done';
+  if (pct < 30) return 'behind';
+  return '';
+}
+
+async function fetchJobs() {
+  try {
+    const r = await fetch(JOBS_CSV);
+    const text = await r.text();
+    const rows = parseCSV(text);
+    const container = document.getElementById('jobs-rows');
+    if (!rows.length) {
+      container.innerHTML = '<div class="empty-state">No active jobs found.</div>';
+      return;
+    }
+    container.innerHTML = rows.map(r => {
+      const pct = Math.min(100, Math.max(0, parseInt(r.progress) || 0));
+      const pcls = progressClass(pct, r.status);
+      return `
+        <div class="job-row">
+          <div class="job-number">${r['job number'] || r['job#'] || r['job #'] || '—'}</div>
+          <div class="job-client">${r.client || '—'}</div>
+          <div class="job-due">${r['due date'] || r.due || '—'}</div>
+          <div class="progress-wrap">
+            <div class="progress-bar"><div class="progress-fill ${pcls}" style="width:${pct}%"></div></div>
+            <div class="progress-pct">${pct}%</div>
+          </div>
+          <div>${statusBadge(r.status)}</div>
+        </div>`;
+    }).join('');
+    const now = new Date();
+    document.getElementById('jobs-updated').textContent = now.toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'});
+  } catch(e) {
+    document.getElementById('jobs-rows').innerHTML = '<div class="empty-state">Could not load job data — check back shortly.</div>';
+  }
+}
+fetchJobs();
+setInterval(fetchJobs, 3 * 60 * 1000);
+
+/* ══════════════════════════════
+   SLIDE ROTATOR
+══════════════════════════════ */
+const screens = ['screen-announcements', 'screen-jobs'];
+let currentScreen = 0;
+
+function goTo(n) {
+  document.getElementById(screens[currentScreen]).classList.remove('active');
+  document.getElementById(`dot-${currentScreen}`).classList.remove('active');
+
+  // If we're leaving announcements, advance the page for next time
+  if (currentScreen === 0) {
+    annPage = (annPage + 1) % annPageCount;
+  }
+
+  currentScreen = n % screens.length;
+  const el = document.getElementById(screens[currentScreen]);
+  el.style.display = 'grid';
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => el.classList.add('active'));
+  });
+  document.getElementById(`dot-${currentScreen}`).classList.add('active');
+
+  // Re-render announcements on page advance
+  if (currentScreen === 0) renderAnnPage(annPage);
+}
+
+setInterval(() => goTo(currentScreen + 1), SLIDE_SECONDS * 1000);
+</script>
+</body>
+</html>
