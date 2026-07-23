@@ -34,7 +34,7 @@
   .screen {
     width: 100vw; height: 100vh;
     display: none;
-    grid-template-rows: 88px 1fr 52px;
+    grid-template-rows: 88px 1fr;
     position: absolute;
     inset: 0;
     opacity: 0;
@@ -79,12 +79,7 @@
   }
 
   /* ══════ FOOTER ══════ */
-  footer {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 0 44px 0 48px;
-    background: var(--panel);
-    border-top: 1px solid var(--border);
-  }
+  footer { display: none; }
   .footer-brand {
     font-size: 11px; color: var(--text-dim);
     letter-spacing: 1px; text-transform: uppercase;
@@ -276,8 +271,8 @@
 
   <footer>
     <div class="footer-brand"><div class="live-dot"></div>MJ&H Fabrication, Inc. — Ponca City, OK</div>
-    <div class="footer-ticker-wrap"><div class="footer-ticker-scroll" id="ann-ticker"></div></div>
-    <div class="footer-clock" id="clock1"></div>
+    <div></div>
+
   </footer>
 </div>
 
@@ -304,8 +299,8 @@
 
   <footer>
     <div class="footer-brand"><div class="live-dot"></div>MJ&H Fabrication, Inc. — Ponca City, OK</div>
-    <div class="footer-ticker-wrap"><div class="footer-ticker-scroll" id="jobs-ticker"></div></div>
-    <div class="footer-clock" id="clock2"></div>
+    <div></div>
+
   </footer>
 </div>
 
@@ -325,8 +320,8 @@ function updateClock() {
   const h = now.getHours(), m = now.getMinutes();
   const ampm = h >= 12 ? 'PM' : 'AM';
   const str = `${h%12||12}:${String(m).padStart(2,'0')} ${ampm}`;
-  document.getElementById('clock1').textContent = str;
-  document.getElementById('clock2').textContent = str;
+  const el = document.getElementById('global-clock');
+  if (el) el.textContent = str;
 }
 setInterval(updateClock, 1000);
 updateClock();
@@ -560,14 +555,12 @@ async function fetchTicker() {
     const messages = rows.map(r => r.message || r.Message || Object.values(r)[0] || '').filter(Boolean);
     if (!messages.length) return;
     const combined = messages.join('     ·     ');
-    const el1 = document.getElementById('ann-ticker');
-    const el2 = document.getElementById('jobs-ticker');
-    if (el1) el1.textContent = combined;
-    if (el2) el2.textContent = combined;
-    // Adjust animation duration based on message length (longer = slower scroll)
-    const duration = Math.max(20, messages.length * 8) + 's';
-    if (el1) el1.style.animationDuration = duration;
-    if (el2) el2.style.animationDuration = duration;
+    const el = document.getElementById('global-ticker');
+    if (el) {
+      el.textContent = combined;
+      const duration = Math.max(30, messages.length * 10) + 's';
+      el.style.animationDuration = duration;
+    }
   } catch(e) {
     console.log('Ticker fetch failed', e);
   }
@@ -575,5 +568,37 @@ async function fetchTicker() {
 fetchTicker();
 setInterval(fetchTicker, 3 * 60 * 1000);
 </script>
+
+<!-- PERSISTENT TICKER — sits above both screens, never resets -->
+<div id="global-ticker-bar" style="
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: 52px;
+  background: #212429;
+  border-top: 1px solid #2e343d;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  z-index: 999;
+  padding: 0 24px;
+  gap: 16px;
+">
+  <span style="font-size:10px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#1285D5; white-space:nowrap; flex-shrink:0;">UPDATES</span>
+  <div style="flex:1; overflow:hidden; position:relative;">
+    <div id="global-ticker" style="
+      display: inline-block;
+      white-space: nowrap;
+      font-size: 13px;
+      color: #7a8694;
+      animation: ticker-scroll 40s linear infinite;
+    "></div>
+  </div>
+  <div id="global-clock" style="
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 20px; font-weight: 600;
+    color: #f0f4f8; letter-spacing: 1px;
+    white-space: nowrap; flex-shrink: 0;
+  "></div>
+</div>
 </body>
 </html>
