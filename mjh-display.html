@@ -463,7 +463,9 @@ async function fetchAnnouncements() {
   try {
     const r = { text: async () => await fetchCSV(ANN_URL), ok: true };
     const text = await r.text();
+    console.log('ANN RAW:', text.substring(0, 200));
     annData = parseCSV(text);
+    console.log('ANN PARSED:', annData.length, 'rows', JSON.stringify(annData[0]));
     buildCarousel();
     const now = new Date();
     document.getElementById('ann-updated').textContent =
