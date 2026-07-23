@@ -389,7 +389,7 @@ function buildCarousel() {
 
   // Show 2 cards per page — pair them up
   const vpWidth = vp.offsetWidth || window.innerWidth - 96;
-  console.log('BUILD CAROUSEL vpWidth:', vpWidth, 'annData:', annData.length);
+  console.log('BUILD CAROUSEL vpWidth:', vpWidth, 'annData:', annData.length, 'vp display:', window.getComputedStyle(vp).display, 'vp height:', vp.offsetHeight);
   const gap = 20;
   const cardWidth = (vpWidth - gap) / 2;
 
@@ -400,6 +400,7 @@ function buildCarousel() {
   }
   window._annPages = pages;
 
+  console.log('PAGES:', pages.length, 'TRACK el:', !!track, 'screen active:', document.getElementById('screen-announcements').classList.contains('active'));
   track.innerHTML = pages.map((pair, pi) => {
     return `<div class="ann-page" style="display:flex;gap:${gap}px;width:${vpWidth}px;flex-shrink:0;">` +
       pair.map(r => {
